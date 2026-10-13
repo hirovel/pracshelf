@@ -1,0 +1,152 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>处理与记录 · PracShelf</title><script>try{document.documentElement.dataset.theme=localStorage.getItem('workspace-theme')||'dark'}catch{}</script><script src="/assets/ui.js"></script><link rel="stylesheet" href="/assets/workbench.css"><link rel="stylesheet" href="/curation.css"><link rel="stylesheet" href="/assets/record-view.css"><style>@font-face{font-family:Inter;src:url(/_astro/InterVariable.DiVDrmQJ.woff2)format("woff2");font-weight:100 900;font-display:swap}.app-header{z-index:110;color:#dfe5ee;background:#171a21;border-bottom:1px solid #2b313d;flex-shrink:0;align-items:center;gap:22px;min-height:56px;padding:0 26px;font:12px/1.8 Inter,Microsoft YaHei,sans-serif;display:flex;position:relative}.app-header *{box-sizing:border-box}.app-header a{white-space:nowrap;text-decoration:none;color:inherit!important}.app-brand{flex-shrink:0;font-size:13px}.app-document{text-overflow:ellipsis;white-space:nowrap;color:#9da8b8;flex:1;min-width:0;font-size:11px;overflow:hidden}.app-navigation{align-items:center;gap:6px;display:flex}.app-navigation a{border-radius:5px;padding:7px 13px}.app-navigation a[aria-current=page],.app-navigation a:hover,.app-publishing summary:hover{background:#ffffff0d}.app-navigation a[hidden]{display:none!important}.app-header :focus-visible{outline-offset:3px;outline:2px solid #a3bfee}.app-publishing{position:relative}.app-publishing summary{cursor:pointer;border-radius:5px;padding:7px 8px;font-size:11px;list-style:none}.app-publishing summary::-webkit-details-marker{display:none}.app-publishing nav{background:#1e232d;border:1px solid #353e4b;border-radius:7px;gap:4px;min-width:175px;padding:10px;display:grid;position:absolute;top:40px;right:0;box-shadow:0 8px 24px #0005}.app-publishing nav a{padding:6px 8px}.app-publishing nav a:hover{background:#ffffff0d}.app-publishing small{color:#9da8b8;padding:8px;font-size:10px}.app-header #theme{color:#9da8b8;cursor:pointer;background:0 0;border:0;place-items:center;padding:5px;display:grid}.app-header svg{fill:none;stroke:currentColor;stroke-width:1.3px;width:17px;height:17px}.terminal-app .terminal-shell{flex:1;min-height:0;display:flex}.terminal-app .workspace-editor{flex:1}.terminal-app{font-family:Inter,Microsoft YaHei,sans-serif}.terminal-app .terminal-main{width:100%;max-width:1382px;margin:0 auto}.terminal-app .workspace-document-tab{font-family:Inter,Microsoft YaHei,sans-serif}html[data-theme=dark]:has(.terminal-app){--paper:oklch(14.68% .01 262.04);--canvas:oklch(12.92% .005 262.04);--ink:oklch(93.66% .027 262.04);--muted:oklch(77.16% .028 262.04);--line:oklch(24.84% .018 262.04);--accent:oklch(81.53% .078 262.04)}.reading-blog>.app-header{position:fixed;inset:0 0 auto}.reading-blog .dock-header,.reading-blog .reading-island{top:80px}.reading-blog .dock{width:min(280px,100vw - 32px)}.reading-blog[data-view=library] .dock{width:auto}.reading-blog .app-header{font-size:12px}.reading-blog .prose :is(h2,h3){scroll-margin-top:154px}@media (width<=720px){.app-header{flex-wrap:wrap;gap:6px 14px;min-height:86px;padding:8px 16px}.app-brand{font-size:12px}.app-document{display:none}.app-navigation{flex-basis:100%;order:3;gap:3px}.app-navigation a{padding:5px 11px;font-size:11px}.app-publishing{margin-left:auto}.app-header #theme{margin-left:0}.reading-blog .dock-header,.reading-blog .reading-island{top:108px}.reading-blog[data-view=library] .library-page{padding-top:176px}}@media (prefers-reduced-motion:no-preference){.app-navigation a{transition:background-color .15s}}@media (width<=720px){.reading-blog .prose :is(h2,h3){scroll-margin-top:184px}}
+</style><link rel="stylesheet" href="/_astro/Base.DbYAzq4y.css"></head><body class="terminal-app workbench"><a class="sr-only focus:not-sr-only focus:fixed focus:start-1 focus:top-1.5" href="#main">跳到内容</a><header id="main-header" class="app-header" aria-label="私有资料工作台"><a href="/" class="app-brand">PracShelf</a><span id="app-document" class="app-document"></span><nav aria-label="产品导航" class="app-navigation"><a href="/" data-app-route="library">资料</a><a href="/inbox" data-app-route="collect">收集</a><a href="/pipeline" data-app-route="pipeline">流水线</a><a data-app-route="reading" hidden>当前文章</a><a href="/setup" data-app-route="setup">设置</a></nav><details class="app-publishing"><summary>发布</summary><nav aria-label="本地发布准备"><a href="/publication" data-app-route="publication">公开预览</a><a href="/reading-builds" data-app-route="builds">构建结果</a><small>本机私有 · 尚未部署</small></nav></details><button id="theme" aria-label="切换工作区外观" title="切换工作区外观"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 15A8 8 0 0 1 9 4a8 8 0 1 0 11 11Z"></path></svg></button></header><script type="module" src="/_astro/ApplicationHeader.astro_astro_type_script_index_0_lang.CEK7vDV2.js"></script><div class="terminal-shell"><div class="workspace-editor"><div class="workspace-document-tab"><span>处理与记录</span><span class="workspace-file-state" id="workspace-context">本地资料</span></div><main id="main" class="terminal-main"><div class="workbench-main"><div class="workbench-heading"><div><h1>处理与记录</h1><p>查看已保存原文、提取尝试和可选翻译。</p></div></div>
+<div id="demo-notice" class="demo-notice" hidden>演示环境 · 使用合成文章和演示验收记录，与真实资料库分开保存。</div>
+
+<div id="error" role="alert"></div>
+<div class="layout"><aside class="panel task-sidebar"><details><summary>切换处理任务</summary><div class="topline"><h2>任务记录</h2><button id="refresh">刷新</button></div><p class="muted">包含重试与旧版本；资料库按文章展示。</p><div id="runs"></div></details></aside>
+<section class="panel"><div id="empty" class="empty">选择已有记录查看详情；新资料请从收集页添加。</div><div id="workspace" hidden>
+<h2 id="title"></h2><a id="source-link" target="_blank" rel="noopener noreferrer"></a><p id="created" class="muted"></p>
+<section class="detail-navigation" aria-label="资料详情视图"><div class="controls"><a id="open-reading">阅读原文 ↗</a><a id="write-note">写笔记 ↗</a></div><nav class="detail-tabs workspace-tabs" aria-label="切换资料详情"><button data-detail-view="source" aria-pressed="true">原文与采集记录</button><button data-detail-view="translation" aria-pressed="false">中文翻译（可选）</button><button data-detail-view="review" aria-pressed="false">原文核对</button></nav></section>
+<section id="execution-details" hidden>
+<section id="translation-panel">
+<div class="stage-head"><h2>中文翻译 · 阅读辅助</h2><span id="translation-status" class="badge"></span></div>
+<p id="translation-meta" class="muted"></p>
+<p id="translation-usage" class="muted"></p>
+<p class="muted">提取正文 → 分批翻译 → 原文对照。保留限定条件，不压缩为摘要；译文单独保存，不改变原文或人工验收结论。</p>
+<p id="translation-config" class="notice">尚未配置 DeepSeek 密钥。请设置服务进程的 DEEPSEEK_API_KEY，或在项目 data/deepseek-api-key.txt 中保存密钥后点击“刷新”。密钥不会显示在页面或运行记录里。API 调用按你的账户计费。</p>
+<div class="controls"><button id="translate" class="primary" disabled>翻译全文为中文</button><button id="translation-stop" hidden>当前批次后停止</button><a id="translation-download" target="_blank" rel="noopener" hidden>单独查看完整译文</a></div>
+<p id="translation-error" role="status"></p><p><a id="translation-reading" hidden>打开阅读页 →</a></p>
+<section id="translation-audit" class="summary" hidden><h3>译文审阅 · Codex（AI）</h3><p id="translation-audit-summary"></p><p class="muted">此记录是 AI 对照审阅，不是你的人工验收。原始模型译文保持不变。</p><details><summary>查看具体问题、原文依据与建议</summary><div id="translation-findings"></div></details></section>
+<details id="translation-pairs-details"><summary>原文与中文逐批对照</summary><div id="translation-pairs"></div></details>
+<details><summary>翻译记录：提示词、模型响应、用量与失败原因</summary><a id="translation-json" target="_blank" rel="noopener">翻译 JSON</a><div id="translation-runs"></div><pre id="translation-trace"></pre></details>
+</section></section>
+<section id="processing-panel" hidden>
+<div class="stage-head"><h2>已保存的中文副本</h2><span id="processing-verdict-state" class="badge">尚无结果</span></div>
+<p id="processing-version" class="muted"></p>
+<p>全文翻译完成后自动登记为阅读副本。结构检查与人工核对结果分别显示。</p>
+<fieldset id="processing-actions">
+<details><summary>导入旧翻译或外部结果</summary><div class="controls"><select id="processing-native" aria-label="已有翻译运行"></select><button id="processing-receive-native">接收已有翻译（不调用模型）</button></div>
+<details><summary>使用 Codex 等外部工具处理</summary><p class="muted">下载任务包交给执行工具，要求按包内说明返回结果 JSON 文件，再选择文件导入。你不必手写 JSON。内部调用过程未观察到时保持未知。</p><div class="controls"><a id="processing-task">下载原文任务包</a><label>导入结果文件<input id="processing-file" type="file" accept=".json,application/json"></label></div></details>
+</details></fieldset>
+<label>当前处理结果<select id="processing-select"></select></label>
+<p id="processing-empty" class="muted">尚无中文副本。可在上方启动翻译；已有旧译文可从“导入旧翻译或外部结果”接收。</p>
+<div id="processing-content" hidden>
+<div id="processing-checks-panel"><h3>检查结论</h3><span id="processing-check-state" class="badge"></span><p id="processing-checks" class="muted"></p>
+<details><summary>定位结构问题</summary><ul id="processing-issues"></ul></details>
+<p id="processing-ai" class="muted"></p></div>
+<div id="processing-reader"><h3>逐批对照阅读</h3><div class="controls"><button id="processing-prev">上一批</button><select id="processing-part" aria-label="选择对照批次"></select><button id="processing-next">下一批</button><span id="processing-position" class="muted"></span></div>
+<p id="processing-part-issues" class="notice"></p>
+<div class="translation-columns"><div><strong>保存的原文</strong><pre id="processing-source"></pre></div><div><strong>此结果的中文副本</strong><pre id="processing-target"></pre></div></div></div>
+<details id="processing-review-panel"><summary>人工核对译文（可选）</summary><h3>写下你的验收结论</h3><p class="muted">只记录你亲自核对过的内容。通过意味着接受这份阅读副本，不证明原文观点真实或当前有效。AI 学习材料与本人笔记分开。</p>
+<form id="processing-review-form" style="display:block"><fieldset id="processing-review-fields">
+<label>内容含义<select id="processing-meaning"><option value="unreviewed">尚未核对</option><option value="matched">已逐批核对，未发现遗漏或原意改变</option><option value="issues">发现遗漏或含义改变</option></select></label>
+<label>否定与限定条件<select id="processing-conditions"><option value="unreviewed">尚未核对</option><option value="matched">已核对否定、条件、范围与不确定性</option><option value="issues">发现丢失或强化</option></select></label>
+<label>结论<select id="processing-verdict" required><option value="">请选择</option><option value="pending">暂缓</option><option value="needs_fix">需修复</option><option value="accepted">通过阅读副本验收</option></select></label>
+<label>副本验收备注<textarea id="processing-note" maxlength="2000" placeholder="用自己的话写一两句；暂缓或需修复时请说明具体原因。"></textarea></label>
+<button class="primary">保存我的验收记录</button></fieldset></form>
+<details><summary>查看验收历史</summary><div id="processing-review-history"></div></details></details>
+<details><summary>查看输入绑定、结果和执行来源</summary><p id="processing-evidence"></p><a id="processing-trace-link" target="_blank" rel="noopener" hidden>实际调用记录</a><pre id="processing-record"></pre></details>
+</div><p id="processing-message" role="status"></p><p id="processing-error" role="alert"></p>
+<details><summary>学习这一模块</summary><p>Interface 只接收“哪份原文的哪份结果”，Module 内集中处理版本核对、结构检查、重复提交和验收历史。换执行工具时，页面和验收规则无需重写。</p><p>试着解释：为什么每批都有结果，也不能证明没有漏译一句话？因为批次编号只能证明对应关系，批次内部的含义仍需要核对。</p><a id="processing-json" target="_blank" rel="noopener">观察本模块完整输出 JSON</a></details>
+</section>
+<section id="capture-pane"><div class="graph" id="graph" aria-label="原文处理阶段"></div>
+<div class="stage-head"><h2 id="stage-title"></h2><span id="status" class="badge"></span></div><p id="stage-note" class="muted"></p><div class="summary" id="summary"></div>
+<div class="controls"><button id="execute" class="primary">运行此阶段</button><button id="reextract">用此快照重新提取</button></div></section>
+<section id="original-review" hidden>
+<h2>人工验收记录</h2><p id="review-target" class="muted"></p>
+<div id="review-result"></div><p class="muted">验收的是保存正文与来源是否一致，不代表文章观点正确、方法有效或适用于当前版本。日期未知可以明确保留。</p>
+<details id="review-editor"><summary>填写或修改验收结论</summary>
+<form id="review-form">
+<fieldset id="review-fields" style="border:0;padding:0;margin:0">
+<label>正文（开头、结尾、主要段落）<select id="review-body"><option value="unreviewed">尚未核对</option><option value="matched">已对照，未发现遗漏或混入</option><option value="issues">发现遗漏或混入</option></select></label>
+<label>结构（代码、列表、表格）<select id="review-structure"><option value="unreviewed">尚未核对</option><option value="matched">已对照，关键结构保留</option><option value="not_applicable">原文没有这些结构</option><option value="issues">发现丢失或变形</option></select></label>
+<label>发布日期<select id="review-date-status"><option value="unreviewed">尚未核对</option><option value="confirmed">已找到明确日期及依据</option><option value="unknown">已查看，仍无法确认日期</option></select></label>
+<div id="review-date-fields" hidden><label>核实的发布日期<input id="review-date" type="date"></label><label>日期依据<textarea id="review-date-evidence" maxlength="2000" placeholder="原文位置、逐字引文或来源链接"></textarea></label></div>
+<label>验收结论<select id="review-verdict" required><option value="">请选择</option><option value="accepted">通过原文验收</option><option value="needs_fix">需修复</option><option value="pending">暂缓</option></select></label>
+<label>备注（需修复或暂缓时必填）<textarea id="review-note" maxlength="2000" placeholder="记录具体问题或你的核对说明"></textarea></label>
+<button class="primary" id="review-submit">保存验收记录</button>
+</fieldset></form></details>
+<p id="review-message" role="status"></p>
+<details><summary id="review-history-label">查看修改历史（0）</summary><div id="review-history"></div><a id="review-json" target="_blank" rel="noopener">单独查看验收 JSON</a></details>
+</section>
+
+<section id="source-pane"><div class="reader-head" id="saved-original"><h2>保存的原文</h2><a id="artifact-link" target="_blank" rel="noopener">单独打开</a></div>
+<div class="controls"><button data-artifact="text">正文</button><button data-artifact="raw">原始响应</button><button data-artifact="document">元数据与来源</button></div>
+<p class="muted" id="reader-label"></p><pre id="reader">尚无正文。完成获取和提取后，这里显示阅读副本。</pre>
+<p class="notice">对照原网页检查开头、结尾、列表、表格、代码和日期。在“人工验收记录”填写你的结论；提取成功不代表完整或当前有效。</p>
+<details><summary>技术详情：本阶段输入、输出与尝试记录</summary><div class="outputs"><div><h3>输入</h3><pre id="input"></pre></div><div><h3>输出</h3><pre id="output"></pre></div></div><a id="endpoint" target="_blank" rel="noopener">阶段 JSON</a><pre id="history"></pre></details></section>
+</div></section></div>
+
+</div></main></div></div><footer class="terminal-footer"><span>本地资料库</span><span>原文与个人笔记独立保存</span></footer><script type="module">var e=document.getElementById(`theme`);e.onclick=()=>{let e=document.documentElement.dataset.theme===`dark`?`light`:`dark`;document.documentElement.dataset.theme=e;try{localStorage.setItem(`workspace-theme`,e)}catch{}};</script><script src="/assets/record-view.js"></script><script src="/review.js"></script><script src="/translation.js"></script><script src="/processing.js"></script><script src="/workspace.js"></script><script>
+const $=id=>document.getElementById(id);
+const labels={not_started:'未开始',running:'运行中',succeeded:'已完成',failed:'失败，可重试',needs_review:'待人工对照',blocked:'等待前一步'};
+const notes={fetch:'获取响应并保存原始字节，尚不解析正文。',extract:'只读取已保存快照，不重新联网。预格式块按原位置保留；发布日期须有明确声明。',validate:'查看基础检查与提取提示。正文完整性、日期真实性需要人工对照。'};
+let current=null,selected='fetch',busy=false,artifact='text',readToken=0;
+async function api(path,options){const r=await fetch(path,options);if(!r.ok){const text=await r.text();let message=text;try{const d=JSON.parse(text).detail;message=Array.isArray(d)?d.map(x=>x.msg).join('\n'):d||text}catch{}throw new Error(message)}return r.json()}
+function fail(e){$('error').textContent=e.message||String(e)}
+const base=()=>'/api/runs/'+current.id;
+function stage(id){return current.stages.find(s=>s.id===id)}
+function latest(id){return stage(id).attempts.at(-1)}
+function preferred(run){return run.stages.slice(0,2).find(s=>['not_started','failed','running'].includes(s.status))?.id||'extract'}
+function render(){
+  $('refresh').disabled=busy;
+  if(!current)return;
+  chineseTranslation.lock(busy);
+  $('empty').hidden=true;$('workspace').hidden=false;
+  const meta=latest('extract')?.output?.metadata;
+  $('title').textContent=meta?.title?.replace(/¶\s*$/,'')||'采集任务 · '+current.id.slice(0,8);
+  document.dispatchEvent(new CustomEvent('workspace:document',{detail:{runId:current.id,title:$('title').textContent}}));
+  $('source-link').textContent=current.url;$('source-link').href=current.url;
+  const reuse=latest('fetch')?.input?.reused_from_pipeline_id;
+  $('created').textContent='任务创建：'+new Date(current.created).toLocaleString()+(reuse?' · 复用快照：'+reuse.slice(0,8)+'（未重新联网）':'');
+  $('graph').replaceChildren();
+  for(const [i,s] of current.stages.slice(0,3).entries()){
+    const b=document.createElement('button');b.className='node '+s.status+(selected===s.id?' selected':'');b.disabled=busy;b.textContent=(i+1)+'. '+s.label;
+    const small=document.createElement('small');small.textContent=s.id==='validate'&&s.status==='needs_review'?'基础检查已生成':labels[s.status]||s.status;b.append(small);b.onclick=()=>{selected=s.id;render()};$('graph').append(b);
+  }
+  const s=stage(selected),attempt=s.attempts.at(-1),o=attempt?.output;
+  $('stage-title').textContent=s.label;$('stage-note').textContent=notes[selected];$('status').textContent=labels[s.status]||s.status;$('status').className='badge '+s.status;
+  $('execute').disabled=busy||!['not_started','failed'].includes(s.status);$('execute').textContent=busy?'处理中…':selected==='validate'?'生成基础检查':s.status==='failed'?'重试此阶段':'运行此阶段';
+  if(selected==='validate')$('status').textContent=s.status==='needs_review'?'基础检查已生成':'程序：'+(labels[s.status]||s.status);
+  $('reextract').disabled=busy||stage('fetch').status!=='succeeded';
+  $('input').textContent=JSON.stringify(attempt?.input||(selected==='fetch'?{url:current.url}:{等待:'前一阶段输出'}),null,2);
+  $('output').textContent=o?JSON.stringify(o,null,2):'尚无输出';$('history').textContent=JSON.stringify(s.attempts,null,2);$('endpoint').href=base()+'/stages/'+selected;
+  let summary=o?.error||'尚无结果。此阶段由你手动运行。';
+  if(o&&!o.error){
+    if(selected==='fetch')summary='HTTP '+(o.request?.status??'未知')+' · 原始响应已保存\n快照：'+(o.request?.snapshot||'未取得');
+    else if(selected==='extract'){
+      const x=o.extraction,blocks=x?.preformatted_blocks;
+      summary='正文 '+(o.text_characters??'?')+' 字符 · 版本 '+(o.version_ids?.join(', ')||'未知')+'\n';
+      summary+='发布日期：'+(o.metadata?.published||'未知')+(x?.date?.status==='declared'?'（网页声明，未独立核实）':'（未核实）')+'\n';
+      summary+=x?'解析版本：'+x.version:'旧版提取，可用保存快照重新提取';
+      if(blocks)summary+='\n预格式块：网页 '+blocks.in_page+' 个，正文保留 '+blocks.in_text+' 个';
+      summary+='\n'+(o.warnings||[]).join('\n');
+    }else summary='基础检查已生成。人工结论见“原文核对”页签。\n'+(o.extraction?.warnings||[]).join('\n');
+  }
+  $('summary').textContent=summary;
+  workbenchDetails.render(current,busy);
+}
+async function readArtifact(){
+  if(!current)return;const id=current.id,name=artifact,token=++readToken;
+  $('artifact-link').hidden=true;
+  if(name==='text'&&!latest('extract')?.output?.version_ids){$('reader').textContent='尚无正文。先完成获取和提取。';$('reader-label').textContent='';return}
+  const path='/api/runs/'+id+'/artifacts/'+name;$('reader').textContent='读取中…';
+  try{const r=await fetch(path);const text=await r.text();if(token!==readToken)return;if(!r.ok)throw new Error(text);$('reader').textContent=text;$('reader-label').textContent={text:'提取正文 · 保留格式的文本副本',raw:'保存的原始响应 · 以文本显示，不执行网页脚本',document:'不可变文档版本与来源快照'}[name];$('artifact-link').href=path;$('artifact-link').hidden=false}catch(e){if(token===readToken){$('reader').textContent='此产物尚不可用。';fail(e)}}
+}
+async function reload(){
+  const rows=await api('/api/runs');const requested=new URL(location.href).searchParams.get('run');
+  if(!current){current=rows.find(r=>r.id===requested)||rows[0]||null;if(current)selected=preferred(current)}else current=rows.find(r=>r.id===current.id)||current;
+  $('runs').replaceChildren();
+  for(const r of rows){const b=document.createElement('button');b.className='run'+(r.id===current?.id?' active':'');b.disabled=busy;const m=r.stages[1].attempts.at(-1)?.output?.metadata;b.textContent=m?.title||r.url;const s=document.createElement('small');s.textContent=new Date(r.created).toLocaleString();b.append(s);b.onclick=()=>{current=r;selected=preferred(r);artifact='text';history.replaceState(null,'','?run='+r.id);$('error').textContent='';render();reload().then(readArtifact).catch(fail)};$('runs').append(b)}render();
+  if(current){const id=current.id;const value=await api('/api/runs/'+id+'/translation');if(current?.id===id){chineseTranslation.show(value,id,busy);await processingResults.load(id,value,value.available);workbenchDetails.render(current,busy);}}
+}
+async function action(fn){if(busy)return;busy=true;$('error').textContent='';render();document.querySelectorAll('.run').forEach(b=>b.disabled=true);try{await fn();history.replaceState(null,'','?run='+current.id+location.hash);await reload();await readArtifact()}catch(e){fail(e)}finally{busy=false;render();document.querySelectorAll('.run').forEach(b=>b.disabled=false)}}
+
+$('execute').onclick=()=>action(async()=>{current=await api(base()+'/stages/'+selected,{method:'POST'});artifact='text'});
+$('reextract').onclick=()=>action(async()=>{current=await api(base()+'/reextract',{method:'POST'});selected='extract';artifact='text'});
+$('translate').onclick=()=>action(()=>chineseTranslation.run(current.id,api));
+$('refresh').onclick=()=>reload().then(readArtifact).catch(fail);
+$('review-form').onsubmit=e=>{e.preventDefault();const payload=originalReview.payload();const id=current.id;action(async()=>{await api('/api/runs/'+id+'/reviews',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});originalReview.saved(id)})};
+document.querySelectorAll('[data-artifact]').forEach(b=>b.onclick=()=>{artifact=b.dataset.artifact;readArtifact()});
+reload().then(readArtifact).catch(fail);
+</script></body></html>

@@ -1,0 +1,20 @@
+---
+import ReadingLayout from '@/layouts/ReadingLayout.astro';
+import '@/styles/library.css';
+---
+<ReadingLayout title="资料" view="library">
+  <div class="library-page">
+    <header class="catalogue-heading"><h1>资料</h1><p>已保存的开发者 AI 实践文章、中文对照与个人笔记。</p></header>
+    <form id="find-form" class="catalogue-find" role="search" aria-label="查找已保存资料">
+      <div class="search-field"><label for="search">搜索资料</label><div class="search-input"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="m13 13 4 4"/></svg><input id="search" type="search" placeholder="标题、作者、来源或笔记" autocomplete="off"/><button id="clear-search" type="button" aria-label="清空搜索" hidden>×</button></div></div>
+      <div class="category-field"><label for="category">分类</label><select id="category"><option value="">全部分类</option><option value="practice">实践经验</option><option value="technical">技术原理</option><option value="updates">产品动态</option><option value="unclassified">未分类</option></select></div>
+    </form>
+    <div class="catalogue-controls"><div class="catalogue-filters" role="group" aria-label="资料筛选"><button data-filter="all" aria-pressed="true">全部</button><button data-filter="kept" aria-pressed="false">已保留</button><button data-filter="notes" aria-pressed="false">笔记</button><button data-filter="archived" aria-pressed="false">归档</button></div><span id="count" role="status"></span></div>
+    <p id="loading" class="catalogue-message" role="status">正在读取资料…</p>
+    <div id="error" class="catalogue-message" role="alert" hidden><p id="error-text"></p><button id="reload-library">重试读取</button></div>
+    <div id="articles" class="catalogue-list" aria-label="已保存文章"></div><p id="empty" class="catalogue-message" hidden></p>
+    <footer class="catalogue-footer"><span>按原文发布日期排序，日期未知的资料列在末尾。</span><a href="/inbox">收集新资料 ↗</a></footer>
+    <noscript><p class="catalogue-message">此页面需要 JavaScript 读取本机已保存资料。</p></noscript>
+  </div>
+  <script>import '@/scripts/library.js';</script>
+</ReadingLayout>

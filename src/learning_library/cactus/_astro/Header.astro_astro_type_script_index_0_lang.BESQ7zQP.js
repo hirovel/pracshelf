@@ -1,0 +1,1 @@
+import{n as e}from"./domElement.RMBHGlr-.js";var t=class extends HTMLElement{#e=!1;connectedCallback(){let t=document.getElementById(`main-header`),n=this.querySelector(`button`);n?.addEventListener(`click`,()=>{t&&e(t,`menu-open`),this.#e=!this.#e,n.setAttribute(`aria-expanded`,this.#e.toString())})}};customElements.define(`mobile-button`,t);

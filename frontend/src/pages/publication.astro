@@ -1,0 +1,44 @@
+---
+import Layout from '@/layouts/Base.astro';
+---
+<Layout title="公开预览">
+<link slot="head" rel="stylesheet" href="/assets/record-view.css"/>
+<div class="publication-ui">
+<header class="page-heading"><div><div class="eyeline">本地博客准备</div><h1>公开笔记预览</h1><p>选择自己的笔记，核对读者将看到的内容，再生成固定版本。此页不调用模型或部署。</p></div></header>
+<nav class="workspace-tabs" aria-label="发布视图"><a href="/publication" aria-current="page">公开快照</a><a href="/reading-builds">阅读站构建</a></nav>
+<p id="pub-message" role="status"></p><p id="pub-error" role="alert"></p>
+<section class="terminal-panel"><div class="panel-body">
+<label for="pub-source">选择已保存原文的资料</label><select id="pub-source"><option value="">读取资料…</option></select>
+<div class="pub-links"><a id="pub-read">阅读与写笔记</a><a id="pub-work">处理记录</a><button id="pub-refresh">刷新</button></div>
+</div></section>
+<ol class="pipeline-strip" aria-label="发布准备步骤"><li id="pub-step-1">01 选择字段</li><li id="pub-step-2">02 冻结预览</li><li id="pub-step-3">03 确认版本</li><li id="pub-step-4">04 导出本地快照</li></ol>
+<div class="pub-columns">
+<section class="terminal-panel"><div class="panel-heading"><h2>准备公开的内容</h2><small>白名单</small></div><div class="panel-body">
+<label for="pub-post-title">博客标题（可选）</label><input id="pub-post-title" type="text" maxlength="240" placeholder="留空使用来源标题"/>
+<p class="subtle">保存笔记即可准备预览；分类和试用记录可选，原文不需要额外填写人工验收表。内容和公开范围在最后确认。</p>
+<label class="pub-check"><input id="pub-note" type="checkbox" checked/> 自己保存的笔记 <span id="pub-note-hint"></span></label>
+<label class="pub-check"><input id="pub-purpose" type="checkbox"/> 用途或保留理由 <span id="pub-purpose-hint"></span></label>
+<label class="pub-check"><input id="pub-quote" type="checkbox"/> 已保存的原文摘录 <span id="pub-quote-hint"></span></label>
+<button id="pub-prepare" class="primary">生成 / 更新预览</button>
+<p class="subtle">勾选只改变本次公开范围；不会修改你的私人笔记。</p>
+</div></section>
+<section class="terminal-panel"><div class="panel-heading"><h2>留在私有工作台</h2><small>不会自动导出</small></div><div class="panel-body"><ul id="pub-private"></ul><p class="subtle">快照仅包含下方逐项列出的字段。请检查你主动选择的文字本身是否适合公开。</p></div></section>
+</div>
+<section class="terminal-panel"><div class="panel-heading"><h2>读者将看到</h2><small id="pub-state">尚未生成预览</small></div><div class="panel-body">
+<p id="pub-empty">选择资料、勾选范围，然后生成预览。没有人工笔记时不会替你生成。</p>
+<div id="pub-preview" hidden><p id="pub-stale" role="status"></p><article class="pub-article"><h2 id="pub-title"></h2><div id="pub-body" class="pub-note-body"></div><p id="pub-source-detail" class="subtle"></p></article><details><summary>来源与已选择的其他字段</summary><dl id="pub-fields"></dl></details>
+<details><summary>完整公开 JSON / 实际导出的笔记字段</summary><pre id="pub-json"></pre></details>
+<p class="subtle" id="pub-hash"></p><h3>确认前检查</h3><ul id="pub-blockers"></ul>
+<label class="pub-check"><input id="pub-confirm" type="checkbox"/> 我已逐项核对这一版，并确认这些内容可以公开。</label>
+<label class="pub-check" id="pub-rights-label" hidden><input id="pub-rights" type="checkbox"/> 我已核实所选摘录的公开使用依据。</label>
+<div class="pub-links"><button id="pub-approve">确认这一版</button><button id="pub-export-preview">下载未批准预览</button><button id="pub-export-approved" class="primary">下载已确认快照</button></div>
+<p class="subtle">确认与下载都不会上线。“未批准预览”不应交给公开站点构建；导出成功也不表示已经发布。</p></div>
+</div></section>
+<section class="terminal-panel"><div class="panel-heading"><h2>版本与运行记录</h2><small>模型调用：0</small></div><div class="panel-body"><p>预览、确认和导出分别记录；这些内部关联不进入公开笔记。</p><div id="pub-history"></div><details><summary>当前输入与私有记录</summary><div id="pub-audit"></div></details></div></section>
+</div>
+<script is:inline src="/assets/record-view.js"></script><script>import '@/scripts/publication';</script>
+<style is:global>
+.pub-article{max-width:780px;padding:16px 0 24px}.pub-article>h2{font-size:24px!important;line-height:1.5}.pub-note-body{font-size:14px;line-height:1.9}.pub-note-body h2{font-size:18px;margin:28px 0 14px}.pub-note-body h3{font-size:16px;margin:24px 0 12px}.pub-note-body ul,.pub-note-body ol{padding-left:24px}.pub-note-body ol{list-style:decimal}.pub-note-body pre{background:var(--canvas);border:1px solid var(--line);border-radius:5px;padding:16px;white-space:pre;overflow:auto}.pub-note-body pre code{font:12px/1.8 ui-monospace,monospace}.pub-note-body blockquote{border-left:2px solid var(--line);padding-left:18px;margin:20px 0}.pub-note-body a{color:var(--accent);text-decoration:underline}#pub-post-title{width:100%}
+.publication-ui{max-width:1100px}.publication-ui .terminal-panel{margin-bottom:20px}.pub-columns{display:grid;grid-template-columns:1fr 1fr;gap:20px}.pub-check{display:flex;align-items:flex-start;gap:10px;margin:14px 0}.pub-check input{width:auto!important;margin-top:4px}.pub-check span{font-size:.8rem;color:var(--muted)}.pub-links{display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin:18px 0}.pub-links a{color:var(--accent);text-decoration:underline}.publication-ui pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:420px;overflow:auto;font-size:.8rem}.publication-ui dl{display:grid;grid-template-columns:140px 1fr;gap:12px}.publication-ui dd{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}.publication-ui dt{color:var(--muted)}.publication-ui h3{margin:20px 0 12px}.publication-ui button:disabled{opacity:.4;cursor:not-allowed}#pub-error,#pub-stale{color:var(--danger)}#pub-source{width:100%;max-width:100%}#pub-hash{overflow-wrap:anywhere}.publication-ui ul{padding-left:20px;list-style:disc}.publication-ui li{margin:8px 0}.publication-ui summary{cursor:pointer}.publication-ui [hidden]{display:none!important}@media(max-width:800px){.pub-columns{grid-template-columns:1fr;gap:0}.publication-ui dl{grid-template-columns:1fr;gap:5px}.publication-ui dd{margin-bottom:12px}}
+</style>
+</Layout>

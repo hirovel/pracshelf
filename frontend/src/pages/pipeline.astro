@@ -1,0 +1,47 @@
+---
+import Layout from '@/layouts/Base.astro';
+import '@/styles/pipeline.css';
+---
+<Layout title="流水线" pageClass="pipeline-workspace">
+  <link slot="head" rel="stylesheet" href="/assets/record-view.css"/>
+  <header class="flow-heading">
+    <div><p class="flow-eyebrow">私有工作台</p><h1>资料处理</h1></div>
+    <div class="flow-tools">
+      <details><summary id="model-label">模型设置</summary><div class="flow-source-menu">
+        <label for="model-provider">新任务提供方</label><select id="model-provider"><option value="codex">Codex · ChatGPT 订阅</option><option value="deepseek">DeepSeek · 可选 API</option></select>
+        <button id="model-save" type="button">保存选择</button><p id="model-status" role="status"></p><small>只影响新提交；失败不切换提供方。<a href="/setup">登录与连接检查 →</a></small>
+      </div></details>
+      <details><summary>收集来源</summary><div class="flow-source-menu"><a href="/inbox">RSS 收件箱</a><a href="/search">网页搜索</a></div></details><button id="flow-open-import" type="button">添加链接</button>
+    </div>
+  </header>
+  <details id="flow-import" class="flow-import" hidden>
+    <summary>添加公开文章链接</summary>
+    <form id="flow-import-form">
+      <label for="flow-import-url">原始文章链接</label><div class="flow-import-line"><input id="flow-import-url" type="url" required maxlength="2000" placeholder="https://…"/><button type="submit" id="flow-import-submit">保存并整理原文</button></div>
+      <details><summary>学习目标与发现说明</summary><label for="flow-import-goal">学习目标</label><textarea id="flow-import-goal" maxlength="1500" required>学习高级开发者在真实开发中使用 AI 的方法、效果证据和限制。</textarea><label for="flow-import-note">发现说明（可选）</label><input id="flow-import-note" maxlength="1500" placeholder="例如：从作者博客发现"/></details>
+      <p>只采集、保存和整理原文，不调用模型。正文就绪后可选择生成核心。</p>
+    </form>
+  </details>
+  <div class="flow-material-select"><label for="flow-material">当前资料</label><select id="flow-material"><option value="">正在读取…</option></select><button id="flow-refresh" type="button">刷新记录</button></div>
+  <p id="flow-error" role="alert" hidden></p><p id="flow-loading" role="status">正在读取已有资料…</p>
+  <section id="flow-document" hidden>
+    <header class="flow-document-heading"><h2 id="flow-title"></h2><p id="flow-meta"></p><a id="flow-source" target="_blank" rel="noopener noreferrer">原始来源 ↗</a></header>
+    <details class="flow-provenance"><summary>发现渠道与来源记录</summary><p id="flow-source-note"></p></details>
+    <div class="flow-result"><span id="flow-result-symbol" aria-hidden="true"></span><strong id="flow-result-summary"></strong><div class="flow-result-links"><a id="flow-reader" data-context-reading>阅读与笔记 →</a><a id="flow-publication" data-context-publication>准备博客 →</a></div></div>
+    <div class="flow-workspace-grid">
+      <aside class="flow-canvas" aria-label="固定处理流程"><p class="flow-canvas-label">处理步骤</p><nav id="flow-steps" class="flow-steps" aria-label="固定处理步骤"></nav>
+        <details id="flow-technical" class="flow-technical"><summary>ELT 技术详情</summary><nav id="flow-technical-steps" aria-label="实际采集步骤"></nav><p class="flow-capture-note" id="flow-capture-note"></p></details>
+        <p class="flow-read-only">中文副本可选。阅读与笔记从结果进入，不需要逐阶段填写验收表。</p>
+      </aside>
+      <section id="flow-inspector" class="flow-inspector" aria-label="当前步骤详情">
+        <div class="flow-inspector-tabs" role="tablist" aria-label="步骤详情"><button id="flow-tab-output" role="tab" aria-controls="flow-output" data-flow-view="output" aria-selected="true">结果</button><button id="flow-tab-input" role="tab" aria-controls="flow-input" data-flow-view="input" aria-selected="false" tabindex="-1">输入</button><button id="flow-tab-records" role="tab" aria-controls="flow-records" data-flow-view="records" aria-selected="false" tabindex="-1">运行记录</button></div>
+        <section id="flow-output" role="tabpanel" aria-labelledby="flow-tab-output" tabindex="0" aria-live="polite"></section>
+        <section id="flow-input" role="tabpanel" aria-labelledby="flow-tab-input" tabindex="0" hidden></section>
+        <section id="flow-records" role="tabpanel" aria-labelledby="flow-tab-records" tabindex="0" hidden><details class="flow-trace" id="flow-trace"><summary>调用与执行历史 <span id="flow-usage"></span></summary><p id="flow-trace-note"></p><div id="flow-record"></div><details><summary>调试数据</summary><a id="flow-json" download>下载技术数据 JSON</a></details></details></section>
+      </section>
+    </div>
+    <p class="flow-page-note">打开、切换、刷新与读取记录不会启动模型任务。</p>
+  </section>
+  <p id="flow-empty" hidden>尚无资料。可从 RSS、网页搜索或公开文章链接保存原文。</p>
+  <script is:inline src="/assets/record-view.js"></script><script>import '@/scripts/pipeline';</script>
+</Layout>

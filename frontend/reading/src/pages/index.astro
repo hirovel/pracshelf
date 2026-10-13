@@ -1,0 +1,13 @@
+---
+import Reading from '../layouts/Reading.astro';
+import {collection,dateLabel} from '../lib/content.mjs';
+import {noteExcerpt} from '../../markdown.mjs';
+const groups=[...new Set(collection.notes.map(({note})=>note.category))];
+---
+<Reading>
+<section class="intro"><p class="eyebrow">NOTES / AI DEVELOPMENT</p><h1>PracShelf</h1><p class="lede">AI 开发实践的个人笔记与参考来源。</p></section>
+{collection.notes.length>0?<>
+{groups.length>1&&<nav class="topics" aria-label="笔记分类">{groups.map(group=><a href={'#'+group}>{group}</a>)}</nav>}
+{groups.map(group=><section class="note-group" id={group}>{group!=='未分类'&&<h2>{group}</h2>}<ul class="note-list">{collection.notes.filter(({note})=>note.category===group).map(({note})=><li><div class="meta">笔记更新 <time datetime={note.note_updated_at}>{dateLabel(note.note_updated_at)}</time></div><h3><a href={'notes/'+note.note_id+'/'}>{note.title}</a></h3><p>{noteExcerpt(note.note)}</p>{(note.freshness!=='适用性待核实'||note.trial!=='未试用')&&<div class="conditions">{[note.freshness!=='适用性待核实'?note.freshness:'',note.trial!=='未试用'?note.trial:''].filter(Boolean).join(' · ')}</div>}</li>)}</ul></section>)}
+</>:<section class="empty"><h2>还没有公开笔记</h2><p>这里会展示已经确认、选入本次阅读站的内容。</p><p class="muted">当前构建包含 0 篇已确认笔记。</p></section>}
+</Reading>

@@ -1,0 +1,3 @@
+import { defineConfig } from 'astro/config';
+import tailwindcss from '@tailwindcss/vite';
+export default defineConfig({devToolbar:{enabled:false},vite:{plugins:[tailwindcss()],server:{proxy:{'/api':'http://127.0.0.1:8766','/assets':'http://127.0.0.1:8766'}}}});

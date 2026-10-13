@@ -1,0 +1,23 @@
+---
+import ReadingLayout from '@/layouts/ReadingLayout.astro';
+---
+<ReadingLayout>
+  <p id="loading" class="loading" role="status">正在读取已保存的文章…</p><p id="error" class="read-error" role="alert" hidden></p>
+  <div id="article" hidden>
+    <header class="article-heading"><h1 id="title"></h1><time id="published"></time></header>
+    <div class="reading-document">
+      <div class="article-provenance"><span id="author"></span><span id="domain"></span><span id="version"></span><span id="classification-title"></span><a id="source" target="_blank" rel="noopener noreferrer">原始文章 ↗</a><a id="work" href="/pipeline" data-context-pipeline>处理工作台 →</a></div>
+      <details id="core-fold" class="core-fold"><summary><span id="core-status">AI 核心与阅读建议</span><span id="core-reason"></span></summary><div id="core" class="core-section"></div></details>
+      <section class="document-section" aria-label="文章正文">
+        <div class="reading-toolbar"><div class="mode-controls" role="group" aria-label="阅读模式"><button data-mode="source">原文</button><button data-mode="translation">中文</button><button data-mode="parallel" aria-pressed="true">对照</button></div><span id="copy-status" class="copy-status"></span></div>
+        <div id="source-body" class="source-prose prose" lang="en"></div><div id="translation-body" class="translation-prose prose" lang="zh-CN"></div><div id="parallel-body" class="parallel-prose"></div>
+      </section>
+      <footer class="article-footer"><p id="discovery"></p><p id="reader-status"></p><a id="processing-link" data-context-pipeline>查看处理状态 →</a></footer>
+    </div>
+  </div>
+  <dialog id="outline-dialog"><div class="dialog-heading"><h2>文章目录</h2><button data-close aria-label="关闭目录">×</button></div><input id="outline-search" type="search" placeholder="查找小节" aria-label="查找小节"/><nav id="outline-links" aria-label="正文小节"></nav><p class="dialog-hint">Ctrl / ⌘ K 打开目录 · Esc 关闭</p></dialog>
+  <dialog id="record-dialog"><div class="dialog-heading"><h2>处理记录</h2><button data-close aria-label="关闭记录">×</button></div><p class="discovery-note">当前读取已保存结果，没有新模型任务。</p><div id="record-stack" class="record-stack"></div><div id="record-metrics" class="record-metrics"></div><details class="record-load"><summary>配置、来源与校验</summary><dl id="record-table" class="record-table"></dl><p id="classification-note" class="discovery-note" hidden></p><p id="discovery-note" class="discovery-note" hidden></p></details><details id="record-detail" class="record-load"><summary>输入与输出 · 按需读取</summary><div id="record-content"></div></details><details class="record-load"><summary>调试数据</summary><p><a id="record-link" class="record-link" download>下载全文分析 JSON</a></p></details><a id="translation-record-link" class="record-link" hidden>查看译文调用记录 →</a></dialog>
+  <dialog id="notes-dialog"><div class="dialog-heading"><h2>我的笔记</h2><button data-close aria-label="关闭笔记">×</button></div><section id="curation-panel"></section></dialog>
+  <script slot="scripts" is:inline src="/assets/record-view.js"></script><script slot="scripts" is:inline src="/curation.js"></script><script slot="scripts" is:inline src="/assets/reader.js"></script>
+  <script>import '@/scripts/reading-polish.js';</script>
+</ReadingLayout>

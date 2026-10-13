@@ -1,0 +1,11 @@
+---
+import '@/styles/application-shell.css';
+const {id='app-header',workspace=false}=Astro.props;
+---
+<header id={id} class="app-header" aria-label="私有资料工作台">
+ <a href="/" class="app-brand">PracShelf</a><span id="app-document" class="app-document"></span>
+ <nav aria-label="产品导航" class="app-navigation"><a href="/" data-app-route="library">资料</a><a href="/inbox" data-app-route="collect">收集</a><a href="/pipeline" data-app-route="pipeline">流水线</a><a data-app-route="reading" hidden>当前文章</a><a href="/setup" data-app-route="setup">设置</a></nav>
+ <details class="app-publishing"><summary>发布</summary><nav aria-label="本地发布准备"><a href="/publication" data-app-route="publication">公开预览</a><a href="/reading-builds" data-app-route="builds">构建结果</a><small>本机私有 · 尚未部署</small></nav></details>
+ {workspace&&<button id="theme" aria-label="切换工作区外观" title="切换工作区外观"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 15A8 8 0 0 1 9 4a8 8 0 1 0 11 11Z"/></svg></button>}
+</header>
+<script>import '@/scripts/application-navigation.js';</script>

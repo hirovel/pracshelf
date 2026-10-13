@@ -1,0 +1,17 @@
+---
+import Layout from '@/layouts/Base.astro';
+import '@/styles/inbox.css';
+---
+<Layout title="RSS 收件箱">
+<header class="page-heading"><div><div class="eyeline">01 / 选材</div><h1>RSS 收件箱</h1><p>按标题、简介、作者和日期选择资料。</p></div></header>
+<div class="inbox-ui">
+<nav class="workspace-tabs" aria-label="选材方式"><a href="/inbox" aria-current="page">RSS 收件箱</a><a href="/search">网页搜索</a></nav>
+<details class="feed-intake"><summary>添加或读取订阅</summary><form id="feed-form"><label for="feed-url">RSS / Atom 地址</label><div class="feed-input"><input id="feed-url" type="url" required maxlength="2000" list="feed-examples" placeholder="https://…"/><button class="primary" type="submit">读取订阅</button></div><datalist id="feed-examples"><option value="https://simonwillison.net/atom/entries/">Simon Willison</option><option value="https://lucumr.pocoo.org/feed.atom">Armin Ronacher</option></datalist><p class="subtle">每次最多读取源中前 30 条。重复刷新保留已有选择，不获取文章全文。</p></form></details>
+<p id="inbox-message" role="status" aria-live="polite"></p><a id="inbox-open-saved" hidden>阅读刚保存的原文 →</a><p id="inbox-error" role="alert"></p>
+<div class="inbox-filters"><label>状态<select id="inbox-state"><option value="pending">待选择</option><option value="selected">已选择保存</option><option value="ignored">已忽略</option><option value="all">全部</option></select></label><label>来源<select id="inbox-feed"><option value="">全部订阅</option></select></label><label>日期<select id="inbox-date"><option value="all">全部日期</option><option value="within_window">近 90 天</option><option value="outside_window">超过 90 天</option><option value="unknown_date">日期未知</option><option value="future_date">未来日期</option></select></label><label class="inbox-search">查找<input id="inbox-query" type="search" placeholder="标题、简介或作者"/></label></div>
+<div class="inbox-list-heading"><h2>候选资料 <small id="inbox-count"></small></h2><button id="inbox-reload">刷新列表</button></div>
+<p id="inbox-empty" class="subtle" hidden>当前条件下没有候选。可以读取订阅或调整筛选条件。</p><div id="inbox-items" aria-label="RSS 候选资料" aria-busy="true"></div>
+<details class="terminal-panel feed-history"><summary>订阅与读取记录</summary><p class="subtle">显示最近 10 次读取结果。简介来自 RSS；日期和作者为来源声明，未独立核实。</p><div id="feed-runs"></div><a href="/api/inbox?state=all" target="_blank" rel="noopener">查看收件箱 JSON ↗</a></details>
+</div>
+<script>import '@/scripts/inbox';</script>
+</Layout>

@@ -1,0 +1,24 @@
+{
+  "name": "pracshelf",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "reading:build": "node scripts/reading.mjs build",
+    "reading:preview": "node scripts/reading.mjs preview",
+    "reading:test": "node --test reading/snapshots.test.mjs"
+  },
+  "overrides": {
+    "@tailwindcss/typography": {
+      "postcss-selector-parser": "7.1.6"
+    }
+  },
+  "dependencies": {
+    "@tailwindcss/typography": "0.5.20",
+    "@tailwindcss/vite": "4.3.3",
+    "astro": "7.3.2",
+    "markdown-it": "15.0.2",
+    "prismjs": "1.30.0",
+    "tailwindcss": "4.3.3"
+  }
+}

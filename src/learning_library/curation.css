@@ -1,0 +1,45 @@
+.curation { max-width: 800px; margin: 60px auto 30px; padding-top: 35px; border-top: 1px solid var(--line); color: var(--ink); scroll-margin-top: 80px; }
+.curation h2 { font-size: 20px; font-weight: 600; }
+.curation-hint { color: var(--muted); font-size: 13px; line-height: 1.8; }
+.curation form { display: block; }
+.curation fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+.curation label { display: block; font-size: 14px; margin: 14px 0; line-height: 1.8; }
+.curation select, .curation textarea, .curation input { display: block; width: 100%; min-width: 0; font: inherit; padding: 9px 10px; margin-top: 5px; border: 1px solid var(--line); border-radius: 5px; background: var(--paper); color: var(--ink); }
+.curation textarea { resize: vertical; line-height: 1.8; }
+.curation-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.curation details { margin: 16px 0; }
+.curation summary { cursor: pointer; color: var(--muted); font-size: 13px; line-height: 1.8; }
+.curation-actions, .curation-links { display: flex; align-items: center; flex-wrap: wrap; gap: 15px; margin-top: 22px; }
+.curation button { font: inherit; font-size: 13px; border: 1px solid var(--line); border-radius: 5px; padding: 9px 14px; background: var(--paper); color: var(--ink); cursor: pointer; }
+.curation .curation-save { background: var(--accent); color: var(--paper); border-color: var(--accent); }
+.curation fieldset:disabled { opacity: .5; }
+.curation a { font-size: 13px; color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
+.curation pre { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 350px; overflow: auto; font-size: 12px; line-height: 1.7; background: var(--canvas); padding: 14px; }
+#curation-error { color: var(--danger); white-space: pre-wrap; font-size: 13px; }
+#curation-state { font-size: 14px; line-height: 1.8; }
+#curation-conflict { padding: 12px; border: 1px solid var(--warning); font-size: 13px; line-height: 1.8; }
+.curation [hidden] { display: none !important; }
+@media(max-width: 600px) { .curation-grid { grid-template-columns: 1fr; gap: 0; } }
+
+.curation h2 { letter-spacing:-.5px; }
+.curation details { border-top:1px solid var(--line); padding-top:16px; }
+.curation textarea:focus,.curation input:focus,.curation select:focus { border-color:var(--accent); }
+.workbench .curation { margin:25px 0; padding:0; border:0; max-width:none; }
+.curation-status{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.curation-private{font-size:11px;line-height:1.5;color:var(--text-tertiary,var(--muted));border:1px solid var(--border-color,var(--line));border-radius:5px;padding:2px 8px}
+.curation .curation-note-label{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.curation-note-label textarea{flex-basis:100%;min-height:230px;resize:vertical;font-size:14px}
+.curation .curation-actions{gap:10px;margin-top:16px}
+.curation-actions a{display:inline-block;padding:9px 12px;border:1px solid var(--border-color,var(--line));border-radius:6px;text-decoration:none;font-size:13px;cursor:pointer}
+.curation-actions a[aria-disabled=true]{opacity:.45;cursor:default}
+.curation-shortcut{font-size:11px;margin-top:8px}
+.curation .curation-debug{margin-top:18px;font-size:12px}
+.curation-saved-note{white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;line-height:1.9}
+.reading-blog #notes-dialog .curation{margin:0;padding:0;border:0;max-width:none}
+.reading-blog #notes-dialog .curation>h2{display:none}
+.reading-blog .curation select,.reading-blog .curation textarea,.reading-blog .curation input{background:var(--foreground);border-color:var(--border-color);color:var(--text-secondary)}
+.reading-blog .curation .curation-save{background:var(--text-primary);color:var(--background);border-color:var(--text-primary)}
+.reading-blog #curation-state{font-size:12px;color:var(--text-tertiary);margin:0}
+.reading-blog #curation-version{margin:6px 0 20px}
+.reading-blog .curation details{border-color:var(--border-color)}
+@media(prefers-reduced-motion:no-preference){.curation-actions button,.curation-actions a{transition:background-color .15s,opacity .15s}}

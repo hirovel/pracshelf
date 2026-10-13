@@ -1,0 +1,20 @@
+---
+import SkipLink from '@/components/SkipLink.astro';
+import ApplicationHeader from '@/components/layout/ApplicationHeader.astro';
+import '@/styles/global.css';
+import '@/styles/application.css';
+import '@/styles/terminal.css';
+const {title,wide=false,pageClass=''}=Astro.props;
+---
+<!doctype html>
+<html lang="zh-CN" data-theme="dark"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>{title} · PracShelf</title>
+<script is:inline>try{document.documentElement.dataset.theme=localStorage.getItem('workspace-theme')||'dark'}catch{}</script>
+<script is:inline src="/assets/ui.js"></script><slot name="head"/></head>
+<body class:list={['terminal-app',wide&&'workbench',pageClass]}>
+<SkipLink/>
+<ApplicationHeader id="main-header" workspace/>
+<div class="terminal-shell">
+<div class="workspace-editor"><div class="workspace-document-tab"><span>{title}</span><span class="workspace-file-state" id="workspace-context">本地资料</span></div><main id="main" class="terminal-main"><slot/></main></div>
+</div><footer class="terminal-footer"><span>本地资料库</span><span>原文与个人笔记独立保存</span></footer>
+<script>import '@/scripts/workspace-shell';</script><slot name="scripts"/>
+</body></html>

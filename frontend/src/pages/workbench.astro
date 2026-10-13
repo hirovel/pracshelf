@@ -1,0 +1,10 @@
+---
+import Layout from '@/layouts/Base.astro';
+import source from '../../../src/learning_library/originals.html?raw';
+const body=source.slice(source.indexOf('<main'),source.indexOf('</main>')+7).replace(/<main[^>]*>/,'<div class="workbench-main">').replace('</main>','</div>');
+const scripts=source.slice(source.indexOf('<script',source.indexOf('</main>')),source.lastIndexOf('</body>'));
+---
+<Layout title="处理与记录" wide={true}>
+<Fragment slot="head"><link rel="stylesheet" href="/assets/workbench.css"/><link rel="stylesheet" href="/curation.css"/><link rel="stylesheet" href="/assets/record-view.css"/></Fragment>
+<Fragment set:html={body}/><script slot="scripts" is:inline src="/assets/record-view.js"></script><Fragment slot="scripts" set:html={scripts}/>
+</Layout>

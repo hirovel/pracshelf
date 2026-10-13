@@ -1,0 +1,12 @@
+---
+import Layout from '@/layouts/Base.astro';
+import '@/styles/setup.css';
+---
+<Layout title="只读演示" pageClass="setup-workspace">
+  <div class="setup-page"><header class="setup-heading"><p class="setup-kicker">隔离演示</p><h1>从资料到自己的笔记</h1></header>
+    <p class="setup-demo-label">以下内容是合成示例，用于说明阅读流程。没有采集真实来源、调用模型或保存笔记，不属于精选文章。</p>
+    <ol class="setup-demo-steps"><li>先看标题、简介、作者和日期，选择要保存的链接。</li><li>保存原始响应，从快照整理完整原文。</li><li>明确启动一次全文价值判断与核心提取；查看原文依据。</li><li>需要中文时启动可选翻译，再阅读并亲自写笔记。</li><li>导出自己保存的 Markdown 笔记。</li></ol>
+    <article class="setup-demo-article"><h2>合成示例：先给编码助手一个可验证的任务</h2><p>示例原文：把修改限定在一个行为，提供输入、预期结果和现有约束，完成后检查实际变化。</p><h3>示例核心</h3><p>先明确可以验证的结果，再让助手修改。以上只是演示内容，没有模型质量验证。</p><h3>个人笔记</h3><p>此处为空。真实资料的笔记由使用者填写，系统不会把示例核心登记成个人笔记。</p></article>
+    <div class="setup-next"><a href="/setup">返回连接设置</a><a href="/inbox">查看 RSS 收件箱</a></div>
+  </div>
+</Layout>

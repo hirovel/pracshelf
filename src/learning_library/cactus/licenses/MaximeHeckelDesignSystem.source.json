@@ -1,0 +1,24 @@
+{
+  "name": "@maximeheckel/design-system",
+  "version": "4.2.3",
+  "license": "MIT",
+  "author": null,
+  "repository": {
+    "url": "git+https://github.com/MaximeHeckel/design-system.git",
+    "type": "git"
+  },
+  "gitHead": "eaaf69f513e491b6b27f3e97979e4ada9213e5fe",
+  "dist": {
+    "shasum": "423be949709e7a28dea2d3232a436e04ed0a6743",
+    "tarball": "https://registry.npmjs.org/@maximeheckel/design-system/-/design-system-4.2.3.tgz",
+    "fileCount": 191,
+    "integrity": "sha512-x2yxqY/ertQuUrU74AiT73ILw6KGBld8E/5IdeGtEPqiyKSovRq4rQrSYGQ09k2YYTXhWC4BY8xyo8k3fPDtyw==",
+    "signatures": [
+      {
+        "sig": "MEUCIQCnYsO94hLPHIVGS6BAbPkZ7wSrXMj1kMxBiCWGJTg6UAIgJScRIQQtidyw/A2GZl7Z5py5hTMoM3IOGQzbo/XY+ZE=",
+        "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+      }
+    ],
+    "unpackedSize": 303598
+  }
+}

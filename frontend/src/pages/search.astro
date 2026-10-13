@@ -1,0 +1,22 @@
+---
+import Layout from '@/layouts/Base.astro';
+import '@/styles/inbox.css';
+---
+<Layout title="搜索资料">
+<header class="page-heading"><div><h1>搜索资料</h1><p>寻找高级开发者的 AI 实践，先看来源摘要，再选择保存原文。</p></div></header>
+<nav class="workspace-tabs" aria-label="选材方式"><a href="/inbox">RSS 收件箱</a><a href="/search" aria-current="page">网页搜索</a></nav>
+<div class="inbox-ui">
+  <form id="search-form" class="feed-intake">
+    <label for="search-provider">搜索方式</label><select id="search-provider"><option value="codex">Codex · ChatGPT 订阅</option><option value="exa">Exa · 可选匿名 MCP</option></select>
+    <label for="query">搜索内容</label><div class="feed-input"><input id="query" required maxlength="1000" placeholder="作者、问题或具体实践，例如 Codemode tool composition"/><button class="primary" type="submit" id="search-submit">搜索一次</button></div>
+    <details><summary>学习目标与缓存</summary><label for="objective">本次搜索的用途</label><textarea id="objective" required maxlength="1500">学习高级开发者在实际项目中使用 AI 的工作流、上下文管理、工具和失败经验；优先原作者的具体实践。</textarea><label><input id="search-refresh" type="checkbox"/>重新搜索（跳过当天缓存）</label></details>
+    <p id="search-policy" class="subtle">同一查询当天优先复用，打开页面不搜索。最多返回 5 个候选；失败不换提供方。</p>
+  </form>
+  <p id="search-message" role="status" aria-live="polite"></p><p id="search-error" class="error" role="alert"></p>
+  <div class="inbox-filters"><label>搜索记录<select id="search-history"><option value="">尚无搜索记录</option></select></label><label>状态<select id="result-state"><option value="pending">待选择</option><option value="selected">已选择保存</option><option value="ignored">已忽略</option><option value="all">全部</option></select></label><button id="search-reload" type="button">刷新记录</button></div>
+  <p id="search-summary" class="subtle">填写查询后运行。打开页面不会搜索。</p>
+  <div id="search-items" aria-label="网页搜索候选" aria-busy="false"></div>
+  <details class="terminal-panel feed-history" id="search-trace" hidden><summary>输入、输出与实际调用记录</summary><p>结果顺序来自搜索服务。作者、日期和摘要未独立核实，不能据此认定文章有价值或已经过时。</p><pre id="search-record"></pre><a id="search-json" target="_blank" rel="noopener">完整记录 JSON ↗</a></details>
+</div>
+<script>import '@/scripts/search';</script>
+</Layout>

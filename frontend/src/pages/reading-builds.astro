@@ -1,0 +1,27 @@
+---
+import Layout from '@/layouts/Base.astro';
+---
+<Layout title="阅读站构建">
+<div class="build-ui">
+<p id="rb-mode" role="status" hidden></p>
+<p id="rb-environment" role="status"></p>
+<header class="page-heading"><div><div class="eyeline">05 / 本地阅读站</div><h1>阅读站构建</h1><p>构建内容来自已确认快照。输入、日志和构建结果保存在私有工作台。</p></div><button id="rb-refresh" class="terminal-button">刷新状态</button></header>
+<nav class="workspace-tabs" aria-label="发布视图"><a href="/publication" data-context-publication>公开快照</a><a href="/reading-builds" aria-current="page">阅读站构建</a></nav>
+<ol class="pipeline-strip" aria-label="构建步骤"><li data-build-stage="validate">01 校验确认版本</li><li data-build-stage="export">02 导出所选快照</li><li data-build-stage="build">03 Astro 静态构建</li><li data-build-stage="verify">04 复核并生成预览</li></ol>
+<p id="rb-message" role="status" aria-live="polite">正在读取快照与构建记录…</p><p id="rb-error" role="alert"></p>
+<section class="terminal-panel"><div class="panel-heading"><h2>本次构建输入</h2><a href="/publication" data-context-publication>公开预览与人工确认 →</a></div><div class="panel-body">
+<p class="subtle">所选版本构成本次完整阅读站。未选中的笔记不会加入本次产物，历史构建仍可查看。</p>
+<div id="rb-candidates"></div>
+<label class="empty-choice"><input id="rb-empty" type="checkbox"/> 本次构建空阅读站（0 篇笔记）</label>
+<div class="build-actions"><button id="rb-build" class="terminal-button" disabled>构建本地阅读站</button><span class="subtle">模型调用 0 次 · 尚未部署</span></div>
+</div></section>
+<section class="terminal-panel"><div class="panel-heading"><h2>构建记录</h2><span class="subtle">最近 30 次</span></div><div id="rb-jobs" class="panel-body"></div></section>
+<p class="subtle">本地预览只提供本次构建的 HTML 和样式。关闭工作台后，此预览链接停止服务；静态文件仍保存在本机。</p>
+</div>
+<script>import '../scripts/reading-builds';</script>
+<style>
+.build-ui{max-width:1100px}.build-ui .pipeline-strip{margin-bottom:22px;border:1px solid var(--line);list-style:none}.build-ui .panel-body{padding:20px}.build-ui .panel-heading{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}.build-ui .terminal-panel{margin-bottom:24px}.build-ui .subtle{color:var(--muted);font-size:12px}.empty-choice{display:flex;align-items:center;gap:10px;margin-top:18px;font-size:13px}.build-actions{display:flex;align-items:center;flex-wrap:wrap;gap:18px;margin-top:22px}#rb-message:not(:empty){margin:16px 0}#rb-error{color:var(--danger);white-space:pre-wrap}input[type=checkbox]{accent-color:var(--accent);width:16px;height:16px;flex-shrink:0}
+.build-ui :global(.candidate-row){padding:16px 0;border-bottom:1px solid var(--line)}.build-ui :global(.candidate-row label){display:flex;align-items:baseline;gap:12px}.build-ui :global(.candidate-row p){margin:8px 0 0;color:var(--muted);font-size:12px}.build-ui :global(.job){padding:20px 0;border-bottom:1px solid var(--line)}.build-ui :global(.job:first-child){padding-top:0}.build-ui :global(.job:last-child){border-bottom:0}.build-ui :global(.job h3){margin:0 0 8px}.build-ui :global(.job p){margin:8px 0}.build-ui :global(.job details){margin-top:14px;font-size:13px}.build-ui :global(.job pre){white-space:pre-wrap;overflow-wrap:anywhere;max-height:380px;overflow:auto;background:var(--paper);padding:16px;font:12px/1.8 Consolas,monospace}.build-ui :global(.job .failure){color:var(--danger)}.build-ui :global(.job .success){color:var(--accent)}.build-ui :global(.job code){display:block;overflow-wrap:anywhere;font-size:12px}.build-ui :global(summary){cursor:pointer}.build-ui :global(.preview-link){display:inline-block;border:1px solid var(--accent);padding:8px 14px;color:var(--accent);margin:8px 0}
+.build-ui .pipeline-strip li[data-state="failed"]{color:var(--danger)}
+</style>
+</Layout>
