@@ -1,12 +1,14 @@
 """Offline synthetic product demo. No credentials, live fetches or model calls.
 
-Run on 8770; records live only in data/curation-demo and are labelled demo.
+Run with ``uv run --no-dev python examples/curation_demo.py``.
+Records live only in data/curation-demo and are labelled demo.
 """
 
+import re
 from pathlib import Path
 
 import httpx
-from fastapi.responses import PlainTextResponse
+from fastapi.responses import JSONResponse, PlainTextResponse
 
 from learning_library.curation import Curation, CurationInput
 from learning_library.pipeline import Pipeline
@@ -60,36 +62,65 @@ def response(request):
     )
 
 
-transport = httpx.MockTransport(response)
-store = Store(ROOT)
-with httpx.Client(transport=transport) as client:
-    flow = Pipeline(store, client, review_origin="demo")
-    records = Curation(store, origin="demo")
-    if not flow.list():
-        for kind in SOURCES:
-            run = flow.create("http://127.0.0.1:8770/demo-source/" + kind)
-            for stage in ("fetch", "extract"):
-                flow.run(run["id"], stage)
-            state = records.inspect(run["id"])
-            if kind in {"skill", "announcement"}:
-                records.record(
-                    run["id"],
-                    CurationInput(
-                        submission_id="demo-seed",
-                        previous_id=None,
-                        version_id=state["version_id"],
-                        category="skill" if kind == "skill" else "knowledge",
-                        decision="kept" if kind == "skill" else "archived",
-                        purpose="演示：查看完整指令和使用条件。"
-                        if kind == "skill"
-                        else "演示：只有公告，没有操作细节。",
-                        note="演示笔记，不是用户本人判断。",
-                    ),
-                )
-store.close()
-app = create_app(ROOT, transport, review_origin="demo")
+def create_demo(data_dir=ROOT):
+    transport = httpx.MockTransport(response)
+    store = Store(data_dir)
+    try:
+        with httpx.Client(transport=transport) as client:
+            flow = Pipeline(store, client, review_origin="demo")
+            records = Curation(store, origin="demo")
+            if not flow.list():
+                for kind in SOURCES:
+                    run = flow.create("http://127.0.0.1:8770/demo-source/" + kind)
+                    for stage in ("fetch", "extract"):
+                        flow.run(run["id"], stage)
+                    state = records.inspect(run["id"])
+                    if kind in {"skill", "announcement"}:
+                        records.record(
+                            run["id"],
+                            CurationInput(
+                                submission_id="demo-seed",
+                                previous_id=None,
+                                version_id=state["version_id"],
+                                category="skill" if kind == "skill" else "knowledge",
+                                decision="kept" if kind == "skill" else "archived",
+                                purpose="演示：查看完整指令和使用条件。"
+                                if kind == "skill"
+                                else "演示：只有公告，没有操作细节。",
+                                note="演示笔记，不是用户本人判断。",
+                            ),
+                        )
+    finally:
+        store.close()
+    app = create_app(data_dir, transport, review_origin="demo")
+
+    @app.middleware("http")
+    async def offline_only(request, call_next):
+        # Only note editing and the demo-only local blog chain may write.
+        # New production actions are denied until explicitly added here.
+        note_or_blog = re.fullmatch(
+            r"/api/runs/[a-f0-9]{32}/(?:curation|publication/previews"
+            r"(?:/[0-9]+/(?:approve|export))?)|/api/reading-builds",
+            request.url.path,
+        )
+        if request.method not in {"GET", "HEAD", "OPTIONS"} and not (
+            request.method == "POST" and note_or_blog
+        ):
+            return JSONResponse(status_code=403, content={
+                "detail": "离线演示只允许编辑演示笔记和本地博客构建；采集、模型和账号操作已禁用。",
+            })
+        return await call_next(request)
+
+    @app.get("/demo-source/{name}")
+    def source(name: str):
+        return PlainTextResponse(
+            SOURCES.get(name, "Demo source not found"), media_type="text/markdown"
+        )
+
+    return app
 
 
-@app.get("/demo-source/{name}")
-def source(name: str):
-    return PlainTextResponse(SOURCES.get(name, "Demo source not found"), media_type="text/markdown")
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(create_demo(), host="127.0.0.1", port=8770)

@@ -19,7 +19,7 @@ from .storage import now
 from .structured_model import call_json, execution, for_provider
 from .value_preview import EXECUTION as PREVIEW_EXECUTION
 
-PROMPT_VERSION = "article-insights-zh-v2-classification"
+PROMPT_VERSION = "article-insights-zh-v3-scope"
 MAX_SOURCE_CHARACTERS = 60_000
 MAX_OUTPUT_TOKENS = 3_000
 INTERRUPTED_REASON = "超过五分钟未完成，结果未知；新提交重试，旧记录保留。"
@@ -87,6 +87,10 @@ read/focus 时 core 用连贯自然中文说明文章的问题、作者思路、
 points 最多 5 个有必要核对的关键论断或原文明确的方法；无须凑数，不把文章改成通用流程。
 claim_type 区分作者判断 author_judgment、原文事实陈述 factual_statement（不等于外部查证）、示例 example。
 保留否定、条件、范围与不确定性。core 和每个 point 都必须有支持其内容的原文证据。
+每条核心论断都先明确适用对象，例如文中的某个实现、服务器或项目；不要把局部行为写成协议或行业的普遍性质。
+保留全文中限制该论断的反例、否定和作者立场；不要用局部引文覆盖相邻段落的重要限定。
+区分“理论可行但笨拙”“尚未采用”“不支持”和“不可能”；不要把实现采用不足概括成协议没有机制。
+原文承认一种替代路径时，不能写成唯一或必需流程；作者否认立场反转时，不用“反过来”暗示反转。
 quote 是原文中连续的短引文，不拼接、不省略；按原文保留代码及其空白。
 skip/uncertain 时 core 为 ""、points 为 []，不强行提取；skip 要有拒绝依据，缺依据用 uncertain。
 conditions 和 time_dependencies 只记录原文明确说明的条件及模型/工具/能力依赖，没有则 []。
@@ -96,18 +100,6 @@ conditions 和 time_dependencies 只记录原文明确说明的条件及模型/�
 
 def encoded(value):
     return json.dumps(value, ensure_ascii=False, sort_keys=True)
-
-
-def _classification_upgrade(previous, incoming):
-    """Reuse unchanged core analysis when this release only adds classification fields."""
-    if previous.get('prompt_version') != 'article-insights-zh-v1' or incoming['prompt_version'] != 'article-insights-zh-v2-classification':
-        return False
-    if any(previous.get(key) != incoming[key] for key in ('version_id', 'content_hash', 'execution')):
-        return False
-    old, new = previous['request'], incoming['request']
-    return ({key: value for key, value in old.items() if key != 'messages'}
-            == {key: value for key, value in new.items() if key != 'messages'}
-            and old['messages'][1:] == new['messages'][1:])
 
 
 def prepare(version, goal, model, *, provider=None, effort="medium"):
@@ -215,25 +207,22 @@ class ArticleInsights:
                                     **(read_trace(self.store.root / "model-runs" / f"insights-{item['id']}") if detail == "full" else {})}
             history.append(item)
         current = [r for r in history if r["current"]]
-        compatible = next((r for r in reversed(history) if incoming and r['status'] == 'completed'
-                           and _classification_upgrade(r['input'], incoming)), None) if not current else None
         # Model selection changes execution, not the source/version a reader sees.
         historical = next((r for r in reversed(history) if incoming and r["status"] == "completed"
                            and r["input"]["version_id"] == incoming["version_id"]
                            and r["input"]["content_hash"] == incoming["content_hash"]), None)
-        latest = current[-1] if current else compatible or historical
+        latest = current[-1] if current else historical
         active = next((r for r in reversed(history) if r["status"] in {"queued", "running"}), None)
         expired = bool(active and datetime.fromisoformat(active["started"]) < datetime.now(UTC) - timedelta(minutes=5))
         if active and not expired:
             latest = active
         choice = selected_model(self.store.root)
-        completed = next((r for r in reversed(current) if r["status"] == "completed"), None) or compatible or historical
+        completed = next((r for r in reversed(current) if r["status"] == "completed"), None) or historical
         action, reason = "start", "一次读取完整原文，判断价值并提取核心；不翻译、不填写笔记。"
         if input_error:
             action, reason = None, input_error
         elif completed:
-            action, reason = None, ("同版本全文结果已保留；分类规则更新不会重跑模型。" if compatible
-                                    else "同版本全文结果已保留；模型或档位变化不会自动重跑。")
+            action, reason = None, "同版本全文结果已保留；提示词或模型配置变化不会重跑。"
         elif active and not expired:
             action, reason = None, "全文分析进行中，关闭网页不会停止。"
         elif not choice.ready:
@@ -285,9 +274,6 @@ class ArticleInsights:
                 return {"id": existing["id"], "launch": False, "reused": True}
             state = self.inspect(run_id)
             completed = next((r for r in reversed(state["history"]) if r["current"] and r["status"] == "completed"), None)
-            if (completed is None and state['latest'] and state['latest']['status'] == 'completed'
-                    and _classification_upgrade(state['latest']['input'], state['input'])):
-                completed = state['latest']
             if completed:
                 return {"id": completed["id"], "launch": False, "reused": True}
             if state["latest"] and state["latest"]["status"] == "completed" and state["action"] is None:

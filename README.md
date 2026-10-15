@@ -64,6 +64,14 @@ uv run --no-dev collect serve
 
 未登录时可打开 `/setup/demo`。演示使用合成数据。
 
+离线交互演示在独立目录保存三篇合成资料：
+
+```powershell
+uv run --no-dev python examples/curation_demo.py
+```
+
+地址为 `http://127.0.0.1:8770/`。可阅读、编辑演示笔记、导出和构建演示博客。采集、搜索、模型和账号操作被禁用。记录位于 `data/curation-demo/`，不进入正式资料库。演示不代表模型质量或个人学习成果。
+
 服务监听 `127.0.0.1`。资料默认保存在 `data/`。关闭终端后服务停止。
 
 ```powershell
@@ -132,6 +140,8 @@ node --test frontend/scripts/publish.test.mjs frontend/src/scripts/navigation-co
 ```
 
 测试使用隔离目录和模拟模型。覆盖版本绑定、重复提交、失败重试、引文定位、笔记导出、快照隔离、构建和备份恢复。
+
+[原文忠实度样例](examples/source-fidelity.md)给出合成输入和对照标准。当前提示词强调对象、否定和可能性。新版提示词尚未经过真实模型对照，历史结果不因此重跑。
 
 ## 当前限制
 

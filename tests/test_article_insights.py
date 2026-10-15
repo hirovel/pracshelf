@@ -199,6 +199,31 @@ def test_classification_prompt_upgrade_keeps_old_core_and_does_not_trigger_anoth
     assert len(calls) == 1
 
 
+def test_fidelity_prompt_upgrade_preserves_the_saved_version_without_another_call(setup, monkeypatch):
+    from learning_library import article_insights
+
+    client, base, run, calls, _, _, _ = setup
+    current_system = article_insights.SYSTEM
+    current_revision = article_insights.PROMPT_VERSION
+    monkeypatch.setattr(article_insights, "SYSTEM", "Synthetic old v2 instructions")
+    monkeypatch.setattr(article_insights, "PROMPT_VERSION", "article-insights-zh-v2-classification")
+    client.post(base + "/insights", json={"submission_id": "before-prompt-upgrade"})
+    saved = client.get(base + "/insights").json()["latest"]
+    monkeypatch.setattr(article_insights, "SYSTEM", current_system)
+    monkeypatch.setattr(article_insights, "PROMPT_VERSION", current_revision)
+
+    state = client.get(base + "/insights").json()
+    assert state["input"]["prompt_version"] == "article-insights-zh-v3-scope"
+    assert "每条核心论断都先明确适用对象" in state["input"]["request"]["messages"][0]["content"]
+    assert state["latest"] == saved | {"current": False}
+    assert state["input"]["cache_key"] != saved["input"]["cache_key"]
+    assert state["action"] is None
+    reused = client.post(base + "/insights", json={"submission_id": "after-prompt-upgrade"}).json()
+    assert reused["id"] == saved["id"] and not reused["launch"]
+    assert client.get("/api/library/" + run).json()["insights"]["output"] == saved["output"]
+    assert len(calls) == 1
+
+
 def test_new_source_reader_does_not_inherit_old_core(setup, monkeypatch):
     client, base, run, calls, _, mode, _ = setup
     client.post(base + '/insights', json={'submission_id': 'old-source'})
