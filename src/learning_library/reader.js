@@ -21,7 +21,7 @@
     el('core-status').textContent='AI 核心 · '+(verdicts[output.effective_recommendation]||'已有结果')+' · 语义未核对';el('core-reason').textContent=judgment.reason;
     const badge=node('div',undefined,'section-title');badge.append(node('h2','原文核心'),node('span','AI 提取 · 语义未核对'));box.append(badge);
     if(!output.core_available){box.append(node('p','当前判断没有可展示的核心内容。原始响应和校验结果保留在运行记录中。','muted'));return;}
-    box.append(node('p',judgment.core,'core-text'));
+    judgment.core.split(/\n\s*\n/).filter(text=>text.trim()).forEach(text=>box.append(node('p',text,'core-text')));
     const points=disclosure(`核心论断与依据 · ${judgment.points.length} 条`);points.className='points';
     judgment.points.forEach((point,index)=>{
       const item=node('div',undefined,'point');item.append(node('small',String(index+1).padStart(2,'0')+' · '+types[point.claim_type]),node('p',point.text));
