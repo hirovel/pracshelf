@@ -1,5 +1,8 @@
 /* Read-only article navigation and code presentation. */
 import Prism from 'prismjs';
+import 'prismjs/components/prism-python.js';
+import {renderNote} from '../../reading/markdown.mjs';
+curationEditor.renderWith(renderNote);
 let frame,headings=[],positions=[];
 function measure(){
   const mode=document.body.dataset.mode;
@@ -37,7 +40,7 @@ function decorateCode(){
     pre.before(wrapper);wrapper.append(pre);
     const lines=document.createElement('span');lines.className='code-lines';lines.setAttribute('aria-hidden','true');
     const count=raw.replace(/\n$/,'').split('\n').length;lines.textContent=Array.from({length:count},(_,i)=>i+1).join('\n');pre.append(lines);
-    const copy=document.createElement('button');copy.className='code-copy';copy.setAttribute('aria-label','复制代码');copy.title='复制代码';
+    const copy=document.createElement('button');copy.type='button';copy.className='code-copy';copy.setAttribute('aria-label','复制代码');copy.title='复制代码';
     const ns='http://www.w3.org/2000/svg',icon=document.createElementNS(ns,'svg'),path=document.createElementNS(ns,'path');
     icon.setAttribute('viewBox','0 0 16 16');icon.setAttribute('aria-hidden','true');path.setAttribute('d','M6 5h7v9H6z M3 11V2h7');icon.append(path);copy.append(icon);
     const status=document.createElement('span');copy.append(status);
@@ -50,6 +53,7 @@ function ready(){
   decorateCode();measure();
 }
 document.addEventListener('reader:ready',ready);
+document.addEventListener('reader:note-preview',decorateCode);
 document.addEventListener('reader:mode',()=>requestAnimationFrame(ready));
 document.querySelector('#core-fold').addEventListener('toggle',measure);
 ready();

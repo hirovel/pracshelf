@@ -87,11 +87,38 @@
     } finally {recordLoading=false;}
   }
   el('record-detail').addEventListener('toggle',()=>{if(el('record-detail').open)loadRecord();});
-  async function openNotes(){if(!article)return;el('notes-dialog').showModal();await curationEditor.load(article.run_id);}
+  const notesDialog=el('notes-dialog'),notesDock=matchMedia('(min-width:1120px)');
+  let notesClosing=null;
+  el('reading-notes').setAttribute('aria-controls','notes-dialog');
+  el('reading-notes').setAttribute('aria-expanded','false');
+  function showNotes(){
+    notesClosing?.cancel();notesClosing=null;
+    notesDialog.getAnimations().forEach(animation=>animation.cancel());
+    if(notesDialog.open)notesDialog.close();
+    if(notesDock.matches)notesDialog.show();else notesDialog.showModal();
+    document.body.classList.add('notes-open');
+    el('reading-notes').setAttribute('aria-expanded','true');
+    if(!reduced())notesDialog.animate([{opacity:0,transform:'translateX(14px)'},{opacity:1,transform:'none'}],{duration:200,easing:'cubic-bezier(.2,.7,.2,1)'});
+  }
+  function closeNotes(){
+    if(!notesDialog.open||notesClosing)return;
+    if(reduced()){notesDialog.close();return;}
+    const animation=notesDialog.animate([{opacity:1,transform:'none'},{opacity:0,transform:'translateX(14px)'}],{duration:160,easing:'ease-in'});
+    notesClosing=animation;
+    animation.finished.catch(()=>{}).finally(()=>{if(notesClosing===animation){notesClosing=null;notesDialog.close();}});
+  }
+  notesDialog.addEventListener('close',()=>{
+    if(notesDialog.open)return;
+    document.body.classList.remove('notes-open');el('reading-notes').setAttribute('aria-expanded','false');
+  });
+  notesDialog.addEventListener('cancel',event=>{event.preventDefault();closeNotes();});
+  notesDock.addEventListener('change',()=>{if(notesDialog.open)showNotes();});
+  async function openNotes(){if(!article)return;showNotes();await curationEditor.load(article.run_id);}
+  function closeDialog(dialog){if(dialog===notesDialog)closeNotes();else dialog.close();}
   el('reading-outline').onclick=()=>{if(!article)return;el('outline-search').value='';el('outline-links').querySelectorAll('a').forEach(link=>link.hidden=false);el('outline-dialog').showModal();el('outline-search').focus();};
-  el('reading-records').onclick=()=>{if(article)el('record-dialog').showModal();};el('reading-notes').onclick=openNotes;
-  document.querySelectorAll('[data-close]').forEach(button=>button.onclick=()=>button.closest('dialog').close());
-  document.querySelectorAll('dialog').forEach(dialog=>dialog.onclick=event=>{if(event.target===dialog){const r=dialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)dialog.close();}});
+  el('reading-records').onclick=()=>{if(article)el('record-dialog').showModal();};el('reading-notes').onclick=()=>{if(notesDialog.open)closeNotes();else openNotes();};
+  document.querySelectorAll('[data-close]').forEach(button=>button.onclick=()=>closeDialog(button.closest('dialog')));
+  document.querySelectorAll('dialog').forEach(dialog=>dialog.onclick=event=>{if(event.target===dialog){const r=dialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)closeDialog(dialog);}});
   document.querySelectorAll('button[data-mode]').forEach(button=>button.onclick=()=>{
     if(mode===button.dataset.mode)return;
     modeAnimation?.cancel();selectMode(button.dataset.mode);
@@ -99,7 +126,10 @@
     if(!reduced())modeAnimation=pane.animate([{opacity:0},{opacity:1}],{duration:180,easing:'ease-out'});
   });
   el('outline-search').oninput=()=>{const query=el('outline-search').value.toLowerCase();el('outline-links').querySelectorAll('a').forEach(link=>link.hidden=!link.textContent.toLowerCase().includes(query));};
-  addEventListener('keydown',event=>{if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='k'){event.preventDefault();el('reading-outline').click();}});
+  addEventListener('keydown',event=>{
+    if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='k'){event.preventDefault();el('reading-outline').click();}
+    if(event.key==='Escape'&&notesDialog.open&&!document.querySelector('dialog:modal')){event.preventDefault();closeNotes();}
+  });
   addEventListener('hashchange',()=>{if(location.hash==='#curation-panel')openNotes();else try{document.getElementById(decodeURIComponent(location.hash.slice(1)))?.scrollIntoView({block:'start'});}catch{}});
   if(!runId){el('loading').hidden=true;el('error').hidden=false;el('error').textContent='需要选择一篇已保存的资料。';return;}
   const result=params.get('result_id');

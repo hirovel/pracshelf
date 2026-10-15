@@ -167,3 +167,25 @@ body.reading-blog{
 .reading-blog .curation-actions button:hover{background:var(--wash)}
 html[data-theme=light] .reading-blog dialog{box-shadow:0 12px 45px #17253b20}
 @media(max-width:720px){.reader-tools{top:86px;padding:4px 14px;justify-content:flex-start}.reader-tools button{padding:5px 9px}.article-heading{min-height:170px;padding-top:28px}.article-heading h1{font-size:26px}.reading-document{margin-top:28px}.copy-status{font-size:11px}.reading-toolbar{gap:10px;flex-wrap:wrap}}
+
+/* The same editor docks beside the article; narrow screens use a native modal. */
+.reading-blog[data-view=article] #main{container-type:inline-size}
+.reading-blog{--notes-width:420px}
+.reader-tools button[aria-expanded=true]{color:var(--ink);background:var(--wash)}
+.reading-blog #notes-dialog{position:fixed;inset:100px 0 0 auto;margin:0;width:var(--notes-width);max-width:none;height:calc(100dvh - 100px);max-height:none;padding:20px 24px 30px;border-radius:0;border-width:0 0 0 1px;border-color:var(--line);background:var(--canvas);box-shadow:-8px 0 24px #0002;overscroll-behavior:contain}
+.reading-blog #notes-dialog[open]{animation:none}
+#notes-dialog .dialog-heading{position:sticky;top:-20px;z-index:5;margin:-20px -24px 20px;padding:16px 24px;background:var(--canvas);border-bottom:1px solid var(--line)}
+.reading-blog #notes-dialog .dialog-heading h2{font-size:15px}
+@media(min-width:1120px){.reading-blog.notes-open #main{margin-right:var(--notes-width)}}
+@media(max-width:1119px){
+ .reading-blog #notes-dialog{inset:12px 12px 12px auto;width:min(720px,calc(100vw - 24px));height:calc(100dvh - 24px);border:1px solid var(--line);border-radius:10px}
+}
+@container(max-width:959px){
+ .reading-blog[data-mode=parallel] .reading-document{width:min(663px,calc(100% - 32px))}
+ .pair-row{grid-template-columns:1fr;gap:24px}
+ .pair-source,.pair-translation{padding-left:16px;border-left:2px solid var(--line)}
+ .pair-translation{border-color:var(--muted)}.parallel-labels{display:none}
+ .pair-source:before,.pair-translation:before{display:block;color:var(--muted);font-size:12px;line-height:21px}
+ .pair-source:before{content:'原文'}.pair-translation:before{content:'机器译文'}
+ .pair-translation[data-origin=human_edit]:before{content:'人工修改副本'}.pair-translation[data-origin=demo]:before{content:'演示副本'}
+}

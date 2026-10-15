@@ -1,14 +1,16 @@
 /* One editor for the reader and workbench. Drafts never count as saved records. */
 const curationEditor = (() => {
   const root = document.getElementById('curation-panel');
-  if (!root) return {load: async () => {}};
+  if (!root) return {load: async () => {}, renderWith: () => {}};
   root.classList.add('curation');
   root.innerHTML = `
     <h2>阅读笔记</h2>
-    <div class="curation-status"><p id="curation-state" role="status">正在读取…</p><span class="curation-private">私有</span></div>
+    <div class="curation-status"><p id="curation-state" role="status">正在读取…</p><span id="curation-draft" class="curation-private" role="status"></span><span class="curation-private">私有</span></div>
     <p id="curation-version" class="curation-hint"></p>
     <form id="curation-form"><fieldset id="curation-fields" disabled>
+      <div class="curation-editor-tabs" role="group" aria-label="笔记视图"><button type="button" id="curation-edit" aria-pressed="true">编辑</button><button type="button" id="curation-preview-button" aria-pressed="false" disabled>预览</button></div>
       <label class="curation-note-label">笔记正文<span id="curation-count" class="curation-hint">Markdown · 0 / 16,000</span><textarea name="note" maxlength="16000" rows="10" placeholder="记录你的理解、实际尝试或待解决的问题。支持 Markdown。"></textarea></label>
+      <section id="curation-preview" class="curation-preview prose" aria-label="Markdown 预览" hidden></section>
       <div class="curation-actions"><button type="submit" class="curation-save">保存笔记</button><a id="curation-export" aria-disabled="true" title="保存笔记正文后可导出">导出 Markdown ↓</a><button type="button" id="curation-reset">恢复已保存内容</button></div>
       <p class="curation-hint curation-shortcut">Ctrl / ⌘ S 保存 · 导出读取已保存正文</p>
       <details class="curation-metadata"><summary>分类、用途与其他记录（可选）</summary><div class="curation-grid">
@@ -44,6 +46,7 @@ const curationEditor = (() => {
   const labels = {inbox:'待整理',kept:'已保留',archived:'已归档'};
   const trialLabels = {not_tried:'未试用',useful:'试用有帮助',mixed:'部分有帮助',not_useful:'试用无帮助',not_applicable:'无需试用'};
   let runId = null, state = null, baseId = null, submissionId = null, token = 0, saving = false;
+  let previewRenderer = null, previewVisible = false;
   const key = () => 'curation-draft-v1:' + location.host + ':' + state.version_id;
   function values() {
     const value = Object.fromEntries(Object.keys(defaults).map(name => [name, form.elements[name].value]));
@@ -53,7 +56,34 @@ const curationEditor = (() => {
   function populate(value) {
     for (const name of Object.keys(defaults)) form.elements[name].value = value[name] ?? defaults[name] ?? '';
     el('curation-count').textContent = 'Markdown · ' + form.elements.note.value.length.toLocaleString() + ' / 16,000';
+    updateDraftState();
+    renderPreview();
   }
+  function updateDraftState() {
+    const saved = state?.latest?.payload || defaults;
+    const dirty = state?.available && Object.entries(values()).some(([name,value]) => value !== saved[name]);
+    el('curation-draft').textContent = dirty ? '未保存' : state?.latest ? '已保存' : '未编辑';
+    el('curation-draft').dataset.dirty = String(Boolean(dirty));
+    return Boolean(dirty);
+  }
+  function renderPreview() {
+    if (!previewVisible || !previewRenderer) return;
+    const box = el('curation-preview');
+    box.innerHTML = previewRenderer(form.elements.note.value);
+    if (!form.elements.note.value.trim()) box.textContent = '笔记正文为空。';
+    document.dispatchEvent(new CustomEvent('reader:note-preview'));
+  }
+  function selectView(preview) {
+    previewVisible = preview;
+    form.elements.note.hidden = preview;
+    el('curation-preview').hidden = !preview;
+    el('curation-edit').setAttribute('aria-pressed', String(!preview));
+    el('curation-preview-button').setAttribute('aria-pressed', String(preview));
+    renderPreview();
+    if (!preview) form.elements.note.focus();
+  }
+  el('curation-edit').onclick = () => selectView(false);
+  el('curation-preview-button').onclick = () => selectView(true);
   function persist() {
     if (!state?.available) return;
     try { sessionStorage.setItem(key(), JSON.stringify({values:values(),baseId,submissionId})); }
@@ -62,8 +92,10 @@ const curationEditor = (() => {
   function changed() {
     submissionId = null;
     el('curation-count').textContent = 'Markdown · ' + form.elements.note.value.length.toLocaleString() + ' / 16,000';
-    el('curation-message').textContent = '草稿未保存。刷新可恢复；导出仍为已保存版本。';
-    persist();
+    const dirty = updateDraftState();
+    el('curation-message').textContent = dirty ? '草稿未保存。刷新可恢复；导出仍为已保存版本。' : state?.latest ? '内容与已保存版本相同。' : '尚无修改。';
+    if (dirty) persist();
+    else try { sessionStorage.removeItem(key()); } catch {}
   }
   form.addEventListener('input', changed);
   form.addEventListener('change', changed);
@@ -164,7 +196,11 @@ const curationEditor = (() => {
       if (savingRun === runId) el('curation-fields').disabled = false;
     }
   };
-  return {async load(id) {
+  return {renderWith(renderer) {
+    previewRenderer = renderer;
+    el('curation-preview-button').disabled = false;
+    renderPreview();
+  }, async load(id) {
     const sequence = ++token;
     runId = id;
     state = null;
