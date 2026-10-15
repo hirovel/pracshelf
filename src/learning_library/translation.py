@@ -310,7 +310,8 @@ class Translation:
                     "UPDATE translation_attempts SET status='failed',finished=?,error=? WHERE id=?",
                     (now(), "上次调用中断；未确认完成，重试可能产生额外调用费用。", active["id"]),
                 )
-                state = self.inspect(pipeline_id, current_config=True)
+                # Recovery belongs to this copy, even if the global model has changed.
+                state = self.inspect(pipeline_id, state["id"])
             part = next(
                 p for p in state["segments"] if p["status"] not in {"succeeded", "preserved"}
             )
