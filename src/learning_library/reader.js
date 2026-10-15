@@ -5,7 +5,6 @@
   const params=new URLSearchParams(location.search);
   const runId=location.pathname.startsWith('/read/')?location.pathname.split('/').filter(Boolean).pop():params.get('run');
   const origins={agent_supplied:'外部 Agent 发现',rss:'RSS',user_link:'手动链接',web_search:'网页搜索',demo:'演示'};
-  const types={author_judgment:'作者判断',factual_statement:'原文事实陈述',example:'示例'};
   const verdicts={read:'推荐阅读',focus:'建议精读',skip:'暂不推荐',uncertain:'信息不足'};
   const classificationOrigins={agent:'助手归类',model_api:'模型分类',human:'本人分类',demo:'演示分类'};
   let article=null, mode='parallel', modeAnimation=null, recordLoaded=false, recordLoading=false;
@@ -18,18 +17,10 @@
     const box=el('core');box.replaceChildren();
     const output=article.insights?.output, judgment=output?.judgment;
     if(!output){el('core-status').textContent='尚无核心结果';el('core-reason').textContent='原文可阅读';box.append(node('p','这篇资料尚未生成核心内容。','muted'));return;}
-    el('core-status').textContent='AI 核心 · '+(verdicts[output.effective_recommendation]||'已有结果')+' · 语义未核对';el('core-reason').textContent=judgment.reason;
-    const badge=node('div',undefined,'section-title');badge.append(node('h2','原文核心'),node('span','AI 提取 · 语义未核对'));box.append(badge);
+    el('core-status').textContent='AI 导读 · '+(verdicts[output.effective_recommendation]||'已有结果');el('core-reason').textContent=judgment.reason;
+    const badge=node('div',undefined,'section-title');badge.append(node('h2','文章导读'),node('span','依据与校验见运行记录'));box.append(badge);
     if(!output.core_available){box.append(node('p','当前判断没有可展示的核心内容。原始响应和校验结果保留在运行记录中。','muted'));return;}
     judgment.core.split(/\n\s*\n/).filter(text=>text.trim()).forEach(text=>box.append(node('p',text,'core-text')));
-    const points=disclosure(`核心论断与依据 · ${judgment.points.length} 条`);points.className='points';
-    judgment.points.forEach((point,index)=>{
-      const item=node('div',undefined,'point');item.append(node('small',String(index+1).padStart(2,'0')+' · '+types[point.claim_type]),node('p',point.text));
-      const evidence=disclosure('原文依据');point.evidence.forEach(quote=>{const block=node('blockquote');block.append(node('p',quote.quote),node('cite',quote.supports));evidence.append(block);});item.append(evidence);points.append(item);
-    });box.append(points);
-    const conditions=[...judgment.conditions,...judgment.unknowns];
-    if(conditions.length){const details=disclosure('条件与未确定事项');details.className='limitations';const list=node('ul');conditions.forEach(text=>list.append(node('li',text)));details.append(list);box.append(details);}
-    box.append(node('p','引文匹配只验证文本来源，不能证明中文结论保留了原文的对象、否定和条件。','quality-note'));
   }
   function copyLabel(){return article.translation_origin==='human_edit'?'人工修改副本':article.translation_origin==='demo'?'演示副本':'机器译文';}
   function renderBody(){
