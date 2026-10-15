@@ -50,7 +50,7 @@
   function selectMode(value){
     mode=article.has_translation&&['source','translation','parallel'].includes(value)?value:'source';document.body.dataset.mode=mode;
     document.querySelectorAll('button[data-mode]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.mode===mode)));
-    el('copy-status').textContent=article.has_translation?copyLabel()+' · '+(article.status==='已验收副本'?'已确认':article.translation_origin==='human_edit'?'修改单独保存':'未人工核对'):'尚无中文副本 · 显示原文';
+    el('copy-status').textContent=mode==='source'?'原文 v'+article.version_id+' · 已保存'+(article.has_translation?'':' · 尚无中文副本'):copyLabel()+' · '+(article.status==='已验收副本'?'已确认':article.translation_origin==='human_edit'?'修改单独保存':'未人工核对');
     const url=new URL(location.href);url.searchParams.set('mode',mode);if(url.hash.startsWith('#section-')&&!url.hash.startsWith('#section-'+mode+'-'))url.hash='';history.replaceState(null,'',url);buildOutline();
     document.dispatchEvent(new CustomEvent('reader:mode'));
     document.dispatchEvent(new CustomEvent('workspace:document',{detail:{runId:article.run_id,title:article.title,readable:true,reader:{mode,resultId:params.get('result_id')}}}));
