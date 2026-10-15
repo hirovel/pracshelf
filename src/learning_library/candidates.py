@@ -303,7 +303,13 @@ class Candidates:
     def submit(self, payload):
         """Add a link and save the original without a model call. Replaying the submission does not retry failures."""
         state = self.import_link(payload)
-        return self.process(state["id"], state["input"]["submission_id"])
+        already_saved = all(s["status"] == "succeeded" for s in state["capture"])
+        result = self.process(state["id"], state["input"]["submission_id"])
+        result["submission_result"] = {
+            "original": ("reused" if already_saved else "saved") if result["version_id"] else "not_saved",
+            "model_tasks_started": 0,
+        }
+        return result
 
     def process(self, candidate_id, submission_id):
         """Resume incomplete work under one durable submission and pipeline lock.

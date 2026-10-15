@@ -130,6 +130,7 @@ def test_fetch_failure_blocks_downstream_then_resumes(setup):
     failures["fetch"] = True
     failed = client.post("/api/candidates/process", json=payload).json()
     assert failed["processing"]["stage"] == "fetch"
+    assert failed["submission_result"] == {"original": "not_saved", "model_tasks_started": 0}
     assert stage_counts(failed) == {"fetch": 1, "extract": 0}
     client.post("/api/candidates/process", json=payload)
     assert counts == {"fetch": 1, "model": 0}

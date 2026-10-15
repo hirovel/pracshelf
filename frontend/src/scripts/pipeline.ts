@@ -22,6 +22,7 @@ async function request(path:string, body?:unknown) {
   return value;
 }
 function error(message='') {get('flow-error').textContent=message;get('flow-error').hidden=!message;}
+function notice(message='') {get('flow-notice').textContent=message;get('flow-notice').hidden=!message;}
 function disclosure(label:string, child:HTMLElement) {const box=node('details','','flow-disclosure');box.append(node('summary',label),child);return box;}
 function renderRecord(value:any) {return (globalThis as any).savedRecordView.render(value);}
 // Only completed, immutable attempts are memoized. Failed reads can be retried.
@@ -254,7 +255,7 @@ async function execute(operation:Operation) {
   if(busy||!current||!operation.action)return;
   const run=current.run_id, key=run+':'+operation.id;
   if(pendingAction?.key!==key)pendingAction={key,submission:crypto.randomUUID()};
-  setBusy(true);error();schedule();
+  setBusy(true);error();notice();schedule();
   try {
     if(operation.action.kind==='insights')await request('/api/runs/'+run+'/insights',{submission_id:pendingAction.submission});
     else if(operation.action.kind==='translation')await request('/api/runs/'+run+'/translation/start',{submission_id:pendingAction.submission});
@@ -264,7 +265,7 @@ async function execute(operation:Operation) {
   finally{setBusy(false);schedule();}
 }
 async function select(run:string) {
-  clearTimeout(poll);const sequence=++generation;error();get('flow-loading').hidden=false;
+  clearTimeout(poll);const sequence=++generation;error();notice();get('flow-loading').hidden=false;
   try{const value=await request('/api/workflows/'+encodeURIComponent(run)+'?detail=summary');if(sequence===generation)display(value);}
   catch(cause){if(sequence===generation)error((cause as Error).message);}
   finally{if(sequence===generation)get('flow-loading').hidden=true;}
@@ -282,13 +283,15 @@ get('flow-open-import').onclick=()=>{get('flow-open-import').closest('details')?
 get('flow-import').addEventListener('toggle',()=>{if(!(get('flow-import') as HTMLDetailsElement).open)get('flow-import').hidden=true;});
 get('flow-import-form').addEventListener('input',()=>importSubmission=crypto.randomUUID());
 get('flow-import-form').onsubmit=async event=>{
-  event.preventDefault();if(busy)return;setBusy(true);error();
+  event.preventDefault();if(busy)return;setBusy(true);error();notice('正在保存原文。本次不调用模型。');
   try{
     const response=await request('/api/candidates/process',{submission_id:importSubmission,url:(get('flow-import-url') as HTMLInputElement).value,goal:(get('flow-import-goal') as HTMLTextAreaElement).value,
       origin:'user_link',source_note:(get('flow-import-note') as HTMLInputElement).value||'在工作台手动添加链接。',as_of:new Intl.DateTimeFormat('sv-SE').format(new Date()),max_age_days:30});
     importSubmission=crypto.randomUUID();selected=response.processing.status==='completed'?'core':response.processing.stage==='extract'?'clean':'fetch';
     (get('flow-import') as HTMLDetailsElement).open=false;await loadList(response.pipeline_id);
-  }catch(cause){error((cause as Error).message);}
+    const outcome=response.submission_result.original;
+    notice(outcome==='not_saved'?'原文尚未保存。失败原因与重试操作见当前步骤。':`${outcome==='reused'?'已复用原文':'已保存原文'} v${response.version_id}。本次新增模型任务 ${response.submission_result.model_tasks_started}。可进入阅读与笔记。`);
+  }catch(cause){notice();error((cause as Error).message);}
   finally{setBusy(false);}
 };
 addEventListener('pagehide',()=>clearTimeout(poll));
