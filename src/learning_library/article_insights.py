@@ -22,6 +22,7 @@ from .value_preview import EXECUTION as PREVIEW_EXECUTION
 PROMPT_VERSION = "article-insights-zh-v2-classification"
 MAX_SOURCE_CHARACTERS = 60_000
 MAX_OUTPUT_TOKENS = 3_000
+INTERRUPTED_REASON = "超过五分钟未完成，结果未知；新提交重试，旧记录保留。"
 EXECUTION = PREVIEW_EXECUTION | {"revision": "article-insights-langchain-v1"}
 
 
@@ -237,7 +238,9 @@ class ArticleInsights:
             action, reason = None, "全文分析进行中，关闭网页不会停止。"
         elif not choice.ready:
             action, reason = None, choice.reason
-        elif expired or (latest and latest["status"] in {"failed", "interrupted"}):
+        elif expired:
+            action, reason = "retry", INTERRUPTED_REASON
+        elif latest and latest["status"] in {"failed", "interrupted"}:
             action = "retry"
         read = {"operation": "inspect", "model_tasks_started": 0,
                 "saved_result_id": latest["id"] if latest and latest["status"] == "completed" else None,
@@ -300,7 +303,7 @@ class ArticleInsights:
             if state["expired"]:
                 self.store.db.execute(
                     "UPDATE article_insights SET status='interrupted',finished=?,error=? WHERE id=?",
-                    (now(), "超过五分钟未完成，结果未知；新提交重试，旧记录保留。", state["active"]["id"]),
+                    (now(), INTERRUPTED_REASON, state["active"]["id"]),
                 )
             identifier = self.store.db.execute(
                 "INSERT INTO article_insights(pipeline_id,submission_id,started,status,input) VALUES(?,?,?,'queued',?)",

@@ -73,6 +73,9 @@ def segment_source(text):
     return parts
 
 
+INTERRUPTED_REASON = "超过五分钟没有进度；结果未知，成功批次保留。"
+
+
 class Translation:
     def __init__(self, store, *, transport=None, origin="model_api"):
         self.store, self.transport, self.origin = store, transport, origin
@@ -425,7 +428,9 @@ class Translation:
             action, reason = None, f"待调用批数超过单次 {MAX_MODEL_CALLS} 次上限，请拆分资料。"
         elif not state.get("id") and not self._config().ready:
             action, reason = None, self._config().reason
-        elif state["status"] in {"failed", "partial"} or expired or latest and latest["status"] in {"failed", "interrupted"}:
+        elif expired:
+            action, reason = "retry", INTERRUPTED_REASON
+        elif state["status"] in {"failed", "partial"} or latest and latest["status"] in {"failed", "interrupted"}:
             action = "retry"
         return {"native": state, "action": action, "reason": reason, "eligible": bool(eligible),
                 "active": active, "expired": expired, "jobs": jobs, "latest": latest,
@@ -458,7 +463,7 @@ class Translation:
             ).fetchone():
                 raise ReviewConflict("旧处理流程仍在运行，不能同时生成中文副本。")
             if plan["expired"]:
-                self.store.db.execute("UPDATE translation_jobs SET status='interrupted',finished=?,error=? WHERE id=?", (now(), "超过五分钟没有进度；结果未知，成功批次保留。", plan["active"]["id"]))
+                self.store.db.execute("UPDATE translation_jobs SET status='interrupted',finished=?,error=? WHERE id=?", (now(), INTERRUPTED_REASON, plan["active"]["id"]))
             translation_id = state.get("id") or self._create(pipeline_id, state, self._config())
             state = self.inspect(pipeline_id, translation_id, detail="summary")
             incoming = {k: state[k] for k in ("version_id", "extract_attempt_id", "model", "provider", "effort", "prompt_version")}

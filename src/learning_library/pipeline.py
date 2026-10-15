@@ -1,6 +1,7 @@
 """Persist capture steps and source checks; content screening belongs to Candidates."""
 
 import json
+from datetime import UTC, datetime, timedelta
 from uuid import uuid4
 
 from .collector import Collector, web_url
@@ -12,6 +13,11 @@ STAGES = [
     ("extract", "提取正文"),
     ("validate", "原文基础检查"),
 ]
+INTERRUPTED_CAPTURE_REASON = "原文处理超过五分钟未完成，结果未知；可显式重试，已保存阶段保留。"
+
+
+def capture_expired(started):
+    return datetime.fromisoformat(started) < datetime.now(UTC) - timedelta(minutes=5)
 
 
 class Pipeline:
@@ -88,13 +94,17 @@ class Pipeline:
                 attempt["input"] = json.loads(attempt["input"])
                 attempt["output"] = json.loads(attempt["output"]) if attempt["output"] else None
             status = history[-1]["status"] if history else "not_started"
+            expired = bool(history and status == "running" and capture_expired(history[-1]["started"]))
+            if expired:
+                status = "failed"
             if (
                 not history
                 and name in {"extract", "validate"}
                 and stages[-1]["status"] != "succeeded"
             ):
                 status = "blocked"
-            stages.append({"id": name, "label": label, "status": status, "attempts": history})
+            stages.append({"id": name, "label": label, "status": status, "attempts": history,
+                           "expired": expired, "interruption_reason": INTERRUPTED_CAPTURE_REASON if expired else None})
         return dict(row) | {"stages": stages, "review": self.reviews.inspect(pipeline_id)}
 
     def run(self, pipeline_id, stage):
@@ -115,6 +125,11 @@ class Pipeline:
             else state["stages"][position - 1]["attempts"][-1]["output"]
         )
         with self.store.db:
+            if selected["expired"]:
+                self.store.db.execute(
+                    "UPDATE pipeline_attempts SET status='failed',finished=?,output=? WHERE id=? AND status='running'",
+                    (now(), json.dumps({"error": INTERRUPTED_CAPTURE_REASON}, ensure_ascii=False), selected["attempts"][-1]["id"]),
+                )
             cursor = self.store.db.execute(
                 """INSERT INTO pipeline_attempts(pipeline_id,stage,status,started,input)
                    SELECT ?,?,?,?,? WHERE NOT EXISTS(
@@ -160,7 +175,7 @@ class Pipeline:
             output, status = {"error": f"{type(error).__name__}: {error}"}, "failed"
         with self.store.db:
             self.store.db.execute(
-                "UPDATE pipeline_attempts SET status=?,finished=?,output=? WHERE id=?",
+                "UPDATE pipeline_attempts SET status=?,finished=?,output=? WHERE id=? AND status='running'",
                 (status, now(), json.dumps(output, ensure_ascii=False), attempt_id),
             )
         return self.inspect(pipeline_id)

@@ -9,6 +9,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from .collector import web_url
 from .model_config import selected_model
+from .pipeline import INTERRUPTED_CAPTURE_REASON, capture_expired
 from .review import ReviewConflict
 from .storage import now
 from .value_preview import prepare as prepare_preview
@@ -276,14 +277,15 @@ class Candidates:
                     "label": s["label"],
                     "status": s["status"],
                     "attempts": len(s["attempts"]),
-                    "error": (last["output"] or {}).get("error") if last else None,
+                    "error": s.get("interruption_reason") or ((last["output"] or {}).get("error") if last else None),
                 }
             )
         active = next((s for s in stages if s["status"] != "succeeded"), None)
-        running = (runs and runs[-1]["status"] == "running") or any(
+        expired = bool(runs and runs[-1]["status"] == "running" and capture_expired(runs[-1]["started"]))
+        running = (runs and runs[-1]["status"] == "running" and not expired) or any(
             s["status"] == "running" for s in stages
         )
-        failed = (runs and runs[-1]["status"] == "failed") or any(
+        failed = expired or (runs and runs[-1]["status"] == "failed") or any(
             s["status"] in {"failed", "interrupted"} for s in stages
         )
         status = (
@@ -294,7 +296,7 @@ class Candidates:
             "stage": active["id"] if active else None,
             "error": None
             if status == "completed"
-            else (runs[-1]["error"] if runs else None) or (active["error"] if active else None),
+            else (INTERRUPTED_CAPTURE_REASON if expired else (runs[-1]["error"] if runs else None)) or (active["error"] if active else None),
             "action": None if running or not active else "retry" if failed else "start",
             "stages": stages,
             "runs": runs,
@@ -329,6 +331,15 @@ class Candidates:
                 return state
             if state["version_id"]:
                 return state
+            for run in self.store.db.execute(
+                "SELECT id,started FROM candidate_processing WHERE pipeline_id=? AND status='running'",
+                (state["pipeline_id"],),
+            ).fetchall():
+                if capture_expired(run["started"]):
+                    self.store.db.execute(
+                        "UPDATE candidate_processing SET status='failed',finished=?,error=? WHERE id=? AND status='running'",
+                        (now(), INTERRUPTED_CAPTURE_REASON, run["id"]),
+                    )
             if (
                 state["processing"]["status"] == "running"
                 or self.store.db.execute(
@@ -356,7 +367,7 @@ class Candidates:
             error = f"处理未完成：{type(exc).__name__}。已有阶段记录保留，可查看详情。"
         with self.store.db:
             self.store.db.execute(
-                "UPDATE candidate_processing SET status=?,finished=?,error=? WHERE id=?",
+                "UPDATE candidate_processing SET status=?,finished=?,error=? WHERE id=? AND status='running'",
                 (status, now(), error, run_id),
             )
         return self.inspect(candidate_id)

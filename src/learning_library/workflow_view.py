@@ -134,7 +134,7 @@ class WorkflowView:
 
         operations = [
             operation("fetch", "E", "获取网页", capture_status,
-                      f"HTTP {request['status']}" if request and request["status"] else result.get("error") or "尚未获取来源响应",
+                      fetch.get("interruption_reason") or (f"HTTP {request['status']}" if request and request["status"] else result.get("error") or "尚未获取来源响应"),
                       executor="HTTP", group="capture", incoming={"url": run["url"]},
                       outgoing={k: request.get(k) for k in ("id", "final_url", "status", "content_type", "error")} if request else None,
                       detail={"attempts": len(fetch["attempts"]), "selected_attempt": latest_fetch}),
@@ -147,7 +147,7 @@ class WorkflowView:
                                 "url": f"/api/runs/{run['id']}/artifacts/raw"} if stored else None),
             operation("clean", "T", "整理正文", clean_status,
                       f"正文 v{source_id} · {len(doc['text']):,} 字符" if doc else
-                      ((clean["attempts"][-1].get("output") or {}).get("error") if clean["attempts"] else None) or "从已保存快照整理，不联网",
+                      clean.get("interruption_reason") or ((clean["attempts"][-1].get("output") or {}).get("error") if clean["attempts"] else None) or "从已保存快照整理，不联网",
                       executor="Python", group="clean", incoming={"request_id": request["id"] if request else None},
                       outgoing={"version_id": source_id, "content_hash": version["content_hash"],
                                 "characters": len(doc["text"]), "extraction": doc.get("extraction"),
@@ -261,7 +261,7 @@ class WorkflowView:
                 "source_html": render_markdown(doc["text"], doc["url"]) if outputs else None,
                 "warnings": (doc.get("extraction") or {}).get("warnings", []),
             }
-        error = (active["attempts"][-1].get("output") or {}).get("error") if active and active["attempts"] else None
+        error = (active.get("interruption_reason") or (active["attempts"][-1].get("output") or {}).get("error")) if active and active["attempts"] else None
         summary = f"原文 v{version['id']} · {len(doc['text']):,} 字符" if doc else error or "尚无保存的正文"
         return stage("source", "原文整理", status, summary, output=output, trace=run["stages"])
 
@@ -271,7 +271,9 @@ class WorkflowView:
         latest_insights = insights["latest"]
         if latest_insights:
             output = latest_insights["output"]
-            if latest_insights["status"] in {"queued", "running"}:
+            if insights["expired"] and latest_insights["status"] in {"queued", "running"}:
+                status, summary = "failed", insights["reason"]
+            elif latest_insights["status"] in {"queued", "running"}:
                 status, summary = "running", "全文分析等待执行" if latest_insights["status"] == "queued" else "全文分析进行中"
             elif latest_insights["status"] != "completed":
                 status, summary = "failed", latest_insights["error"] or "全文分析未完成"
@@ -332,6 +334,8 @@ class WorkflowView:
             status, summary = "failed", f"译文有 {len(checks['issues'])} 项结构问题"
         elif checks:
             status, summary = "completed", "中文副本已生成 · 尚需阅读核对"
+        elif plan["expired"]:
+            status, summary = "failed", plan["reason"]
         elif plan["latest"] and plan["latest"]["status"] in {"failed", "interrupted"}:
             status, summary = "failed", plan["latest"]["error"] or "中文副本未完成"
         elif native["status"] in {"running", "failed"}:
