@@ -66,7 +66,7 @@ class WorkflowView:
         origin = candidate["input"] if candidate else None
         # List responses omit large artifacts. Both paths use the same status rules.
         brief = [{k: s[k] for k in ("id", "title", "status", "label", "summary")} for s in steps]
-        elt = self._elt(run, version, screen, translated, insights)
+        elt = self._elt(run, version, screen, translated, insights, candidate["id"] if candidate else None)
         pipeline_view = self._pipeline_view(elt)
         if not outputs:
             elt = {k: elt[k] for k in ("schema", "status", "summary", "phases", "result")}
@@ -87,7 +87,7 @@ class WorkflowView:
             "insights": insights if outputs else None,
         }
 
-    def _elt(self, run, version, screen, translated, insights):
+    def _elt(self, run, version, screen, translated, insights, candidate_id):
         """Describe real artifacts; E/L share a capture attempt, optional T never gates reading."""
         fetch, clean = run["stages"][:2]
         latest_fetch = fetch["attempts"][-1] if fetch["attempts"] else None
@@ -177,6 +177,9 @@ class WorkflowView:
         ]
         capture_action = {"kind": "stage", "stage": "fetch", "label": "重试采集" if capture_status == "failed" else "获取并保存来源"}
         clean_action = {"kind": "stage", "stage": "extract", "label": "重试正文整理" if clean_status == "failed" else "整理正文"}
+        if candidate_id:
+            capture_action.update(kind="capture", candidate_id=candidate_id)
+            clean_action.update(kind="capture", candidate_id=candidate_id)
         core_action = {"kind": "insights", "label": "重试核心提取" if insights["action"] == "retry" else "判断价值并提取核心"}
         actions = {
             "fetch": capture_action if capture_status in {"not_started", "failed"} else None,

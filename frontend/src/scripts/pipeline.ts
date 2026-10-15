@@ -2,7 +2,7 @@
    submits an explicit action through the existing capture/insights Interface. */
 import {currentRun} from './application-navigation.js';
 declare const readingUI:{reduceMotion:()=>boolean};
-type Operation = {id:string;phase:string;title:string;status:string;label:string;summary:string;executor:string;required:boolean;input:any;output:any;detail:any;action:{kind:string;stage?:string;label:string}|null};
+type Operation = {id:string;phase:string;title:string;status:string;label:string;summary:string;executor:string;required:boolean;input:any;output:any;detail:any;action:{kind:string;stage?:string;candidate_id?:string;label:string}|null};
 type FlowNode = {id:string;title:string;status:string;label:string;summary:string;operation_id:string;operation_ids:string[];optional:boolean};
 type Workflow = {run_id:string;title:string;author:string|null;published:string|null;url:string;version_id:number|null;provenance:any;steps:any[];elt:any;insights:any;pipeline_view:{nodes:FlowNode[]}};
 const get = (id:string) => document.getElementById(id)!;
@@ -259,6 +259,7 @@ async function execute(operation:Operation) {
   try {
     if(operation.action.kind==='insights')await request('/api/runs/'+run+'/insights',{submission_id:pendingAction.submission});
     else if(operation.action.kind==='translation')await request('/api/runs/'+run+'/translation/start',{submission_id:pendingAction.submission});
+    else if(operation.action.kind==='capture')await request('/api/candidates/'+operation.action.candidate_id+'/process',{submission_id:pendingAction.submission});
     else if(operation.action.kind==='stage')await request('/api/runs/'+run+'/stages/'+operation.action.stage,{});
     pendingAction=null;await refresh();
   }catch(cause){error((cause as Error).message);await refresh();}

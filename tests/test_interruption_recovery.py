@@ -193,11 +193,13 @@ def test_interrupted_capture_can_be_explicitly_retried_after_the_deadline(tmp_pa
         view = client.get(f"/api/workflows/{run}?detail=summary").json()
         operation = next(o for o in view["elt"]["operations"] if o["id"] == "fetch")
         assert operation["status"] == "failed" and operation["action"]["label"] == "重试采集"
+        assert operation["action"]["kind"] == "capture"
+        assert operation["action"]["candidate_id"] == candidate["id"]
         assert "结果未知" in operation["summary"]
         same = client.post(f"/api/candidates/{candidate['id']}/process", json={"submission_id": "original"})
         assert same.status_code == 200
         assert calls == {"source": 0, "core": 0, "translation": 0}
-        retry = client.post(f"/api/candidates/{candidate['id']}/process", json={"submission_id": "explicit-retry"})
+        retry = client.post(f"/api/candidates/{operation['action']['candidate_id']}/process", json={"submission_id": "explicit-retry"})
         assert retry.status_code == 200, retry.text
         result = retry.json()
         assert result["version_id"] and result["processing"]["status"] == "completed"
