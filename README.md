@@ -128,7 +128,7 @@ uv sync --locked --extra deepseek --no-dev
 uv sync --locked
 uv run pytest -q
 uv run ruff check src tests examples/curation_demo.py
-node --test frontend/scripts/publish.test.mjs frontend/src/scripts/navigation-context.test.mjs frontend/src/scripts/library-view.test.mjs frontend/reading/markdown.test.mjs frontend/reading/snapshots.test.mjs
+node --test frontend/scripts/publish.test.mjs frontend/src/scripts/navigation-context.test.mjs frontend/src/scripts/library-view.test.mjs frontend/src/scripts/presentation.test.mjs frontend/reading/markdown.test.mjs frontend/reading/snapshots.test.mjs
 ```
 
 测试使用隔离目录和模拟模型。覆盖版本绑定、重复提交、失败重试、引文定位、笔记导出、快照隔离、构建和备份恢复。

@@ -1,6 +1,5 @@
 /* Read-only article navigation and code presentation. */
 import Prism from 'prismjs';
-const reduced=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
 let frame,headings=[],positions=[];
 function measure(){
   const mode=document.body.dataset.mode;

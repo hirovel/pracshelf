@@ -18,6 +18,7 @@ import '@/styles/setup.css';
     </section>
     <section class="setup-detail" aria-label="博客构建条件"><h2>博客构建（可选）</h2><strong id="build-state">正在读取…</strong><p id="build-detail"></p><p>阅读、保存笔记与导出 Markdown 不需要 Node.js。博客构建使用 Node.js 22.12+；这里检查文件与程序是否存在，实际版本由 Astro 构建检查。</p><pre><code>cd frontend
 npm ci</code></pre></section>
+    <section class="setup-detail" aria-label="阅读外观"><h2>阅读外观</h2><label for="motion-preference">动态效果</label><select id="motion-preference"><option value="system">跟随系统</option><option value="reduce">减少动态效果</option></select><p id="motion-status" role="status"></p><p>设置保存在当前浏览器。原文、笔记和模型设置保持不变。</p></section>
     <div class="setup-next"><a href="/pipeline" data-context-pipeline>进入流水线 →</a><a href="/">读取本地资料</a><a href="/setup/demo">查看只读演示</a></div>
     <p class="setup-private">每位使用者连接自己的账号。订阅任务使用该账号额度；本应用不自动转付费 API。已有原文、译文、笔记和结果可在未登录时读取。</p>
     <details class="setup-detail"><summary>命令行与常见问题</summary><div>

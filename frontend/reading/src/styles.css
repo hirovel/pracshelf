@@ -1,6 +1,6 @@
 /* Editorial layout. Public output contains HTML and CSS only. */
 :root{color-scheme:light;--paper:#f6f6f3;--ink:#20262b;--muted:#687078;--line:#dddfda;--accent:#b94b2e}
-*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:32px}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.85 system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}html{scroll-behavior:auto;scroll-padding-top:32px}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.85 system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased}
 a{color:var(--accent);text-underline-offset:4px;text-decoration-thickness:1px}a:hover{text-decoration:underline}a:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:5px}
 .site-header{max-width:1280px;margin:auto;min-height:76px;padding:18px 40px;display:flex;align-items:center;justify-content:space-between;gap:24px}
 .brand{color:var(--ink);font-size:21px;letter-spacing:-.7px;font-weight:720;text-decoration:none}.brand-kind{margin-left:12px;padding-left:12px;border-left:1px solid var(--line);font-size:12px;font-weight:400;letter-spacing:0;color:var(--muted)}

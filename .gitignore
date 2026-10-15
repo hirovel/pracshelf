@@ -41,6 +41,11 @@ vendor/
 **/human-notes/
 **/connection-runtime/
 **/reading-builds/
+
+# The compiled build screen is software; runtime build artifacts stay ignored.
+!/src/learning_library/cactus/reading-builds/
+/src/learning_library/cactus/reading-builds/*
+!/src/learning_library/cactus/reading-builds/index.html
 *.sqlite3
 *.sqlite3-*
 *.db

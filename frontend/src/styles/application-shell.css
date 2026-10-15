@@ -12,4 +12,6 @@ html[data-theme=dark]:has(.terminal-app){--paper:oklch(14.68% .01 262.04);--canv
 .reading-blog .prose :is(h2,h3){scroll-margin-top:100px}
 @media(max-width:720px){.app-header{padding:8px 16px;gap:6px 14px;flex-wrap:wrap;min-height:86px}.app-brand{font-size:12px}.app-document{display:none}.app-navigation{order:3;flex-basis:100%;gap:3px}.app-navigation a{font-size:11px;padding:5px 11px}.app-publishing{margin-left:auto}.app-header #theme{margin-left:0}}
 @media(prefers-reduced-motion:no-preference){.app-navigation a{transition:background-color .15s}}
+/* Explicit local preference also covers browsers whose system preference is unchanged. */
+html[data-motion=reduce],html[data-motion=reduce] *,html[data-motion=reduce] *::before,html[data-motion=reduce] *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
 @media(max-width:720px){.reading-blog .prose :is(h2,h3){scroll-margin-top:130px}}

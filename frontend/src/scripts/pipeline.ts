@@ -1,6 +1,7 @@
 /* ELT state and lineage come from WorkflowView. This page only displays them and
    submits an explicit action through the existing capture/insights Interface. */
 import {currentRun} from './application-navigation.js';
+declare const readingUI:{reduceMotion:()=>boolean};
 type Operation = {id:string;phase:string;title:string;status:string;label:string;summary:string;executor:string;required:boolean;input:any;output:any;detail:any;action:{kind:string;stage?:string;label:string}|null};
 type FlowNode = {id:string;title:string;status:string;label:string;summary:string;operation_id:string;operation_ids:string[];optional:boolean};
 type Workflow = {run_id:string;title:string;author:string|null;published:string|null;url:string;version_id:number|null;provenance:any;steps:any[];elt:any;insights:any;pipeline_view:{nodes:FlowNode[]}};
@@ -93,7 +94,7 @@ function renderSteps() {
     button.setAttribute('aria-pressed',String(step.operation_ids.includes(selected)));button.setAttribute('aria-controls','flow-inspector');
     const title=node('span','','flow-node-title');title.append(node('span',String(index+1).padStart(2,'0'),'flow-node-number'),node('strong',step.title),badge(step));
     button.append(title,node('span',step.summary,'flow-node-summary'),node('span',step.optional?'可选模型任务':'保存原文'===step.title?'采集与正文整理 · 无模型':'一次全文判断与提取','flow-node-executor'));
-    button.onclick=()=>{selected=step.operation_id;renderSteps();renderDetail();showInspector(inspectorView);synchronizeURL();get('flow-stage-'+step.id).focus();if(matchMedia('(max-width:720px)').matches)get('flow-inspector').scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'});};container.append(button);
+    button.onclick=()=>{selected=step.operation_id;renderSteps();renderDetail();showInspector(inspectorView);synchronizeURL();get('flow-stage-'+step.id).focus();if(matchMedia('(max-width:720px)').matches)get('flow-inspector').scrollIntoView({block:'start',behavior:readingUI.reduceMotion()?'auto':'smooth'});};container.append(button);
   }
   const technical=get('flow-technical-steps');technical.replaceChildren();
   for(const operation of operations().slice(0,3)){

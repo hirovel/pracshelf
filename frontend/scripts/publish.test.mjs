@@ -1,8 +1,28 @@
 import {test,mock} from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
+import {spawnSync} from 'node:child_process';
+import {fileURLToPath} from 'node:url';
 import {join,resolve,sep} from 'node:path';
 import {publishCompiledPages} from './publish.mjs';
+
+test('Git includes every compiled page while excluding private build artifacts',async t=>{
+  const root=fileURLToPath(new URL('../../',import.meta.url));
+  const checkout=spawnSync('git',['rev-parse','--show-toplevel'],{cwd:root,encoding:'utf8',windowsHide:true});
+  if(checkout.status!==0||resolve(checkout.stdout.trim())!==resolve(root)){
+    t.skip('Git ignore contract applies in a repository checkout.');return;
+  }
+  const compiled=(await fs.readdir(join(root,'src','learning_library','cactus'),{recursive:true}))
+    .filter(name=>name.endsWith('.html')).map(name=>'src/learning_library/cactus/'+name.replaceAll('\\','/'));
+  assert.ok(compiled.includes('src/learning_library/cactus/reading-builds/index.html'));
+  const privatePaths=['data/reading-builds/demo/input.json','custom-library/reading-builds/job/input.json',
+    'custom-library/model-runs/response.txt','src/learning_library/cactus/reading-builds/unexpected.json'];
+  const result=spawnSync('git',['check-ignore','--no-index','--stdin'],{
+    cwd:root,input:[...compiled,...privatePaths].join('\n')+'\n',encoding:'utf8',windowsHide:true,
+  });
+  assert.equal(result.status,0,result.stderr);
+  assert.deepEqual(result.stdout.trim().split(/\r?\n/).sort(),privatePaths.sort());
+});
 
 async function fixture(t){
   const base=resolve('.test-runs');await fs.mkdir(base,{recursive:true});

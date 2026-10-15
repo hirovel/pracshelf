@@ -1,5 +1,12 @@
 // inspect reads session state only; SDK work starts only from explicit buttons.
 const el=(id:string)=>document.getElementById(id)!;
+declare const readingUI:{reduceMotion:()=>boolean;motionPreference:()=>string;setMotionPreference:(value:string)=>boolean};
+const motion=el('motion-preference') as HTMLSelectElement;
+motion.value=readingUI.motionPreference();
+const motionStatus=()=>el('motion-status').textContent=readingUI.reduceMotion()?'当前减少动态效果。':'当前使用常规动态效果。';
+motionStatus();
+motion.onchange=()=>{const saved=readingUI.setMotionPreference(motion.value);motionStatus();if(!saved)el('motion-status').textContent+=' 浏览器未允许保存，本页设置已生效。';};
+addEventListener('reading:motion',()=>{motion.value=readingUI.motionPreference();motionStatus();});
 const activeStates=new Set(['starting','checking','waiting_login']);
 let timer:ReturnType<typeof setTimeout>|undefined;
 let submitting=false;

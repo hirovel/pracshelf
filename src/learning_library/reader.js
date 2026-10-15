@@ -9,7 +9,7 @@
   const verdicts={read:'推荐阅读',focus:'建议精读',skip:'暂不推荐',uncertain:'信息不足'};
   const classificationOrigins={agent:'助手归类',model_api:'模型分类',human:'本人分类',demo:'演示分类'};
   let article=null, mode='parallel', modeAnimation=null, recordLoaded=false, recordLoading=false;
-  const reduced=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduced=readingUI.reduceMotion;
   function node(tag,text,className){const element=document.createElement(tag);if(text!==undefined)element.textContent=text;if(className)element.className=className;return element;}
   const format=value=>Number.isFinite(value)?value.toLocaleString('zh-CN'):'未知';
   function disclosure(label){const details=node('details');details.append(node('summary',label));return details;}
