@@ -20,6 +20,7 @@ frontend/reading/.astro/
 frontend/reading/node_modules/
 frontend/reading/snapshots/*.json
 vendor/
+/src/learning_library/.cactus-*
 
 # Local planning and research are not part of the software repository.
 /AGENTS.md

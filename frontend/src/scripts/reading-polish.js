@@ -1,56 +1,29 @@
-/* Presentation only: no fetches, processing commands, or persisted user data.
-   Dock/typography follow the pinned Maxime source. Native animations avoid a React runtime. */
+/* Read-only article navigation and code presentation. */
 import Prism from 'prismjs';
-
 const reduced=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
-const island=document.querySelector('.reading-island');
-let frame,headings=[],positions=[],range=1,lastProgress=-1;
-function expandIsland(open){
-  island.dataset.expanded=String(open);document.querySelector('#island-outline').setAttribute('aria-expanded',open);
-  document.querySelector('#island-links').inert=!open;document.querySelector('#island-top').inert=!open;
-}
-document.querySelector('#island-outline').onclick=()=>expandIsland(island.dataset.expanded!=='true');
-document.querySelector('#island-top').onclick=()=>{expandIsland(false);document.querySelector('#reading-top').click();};
-document.addEventListener('pointerdown',event=>{if(!island.contains(event.target))expandIsland(false);});
-document.addEventListener('keydown',event=>{if(event.key==='Escape'&&island.dataset.expanded==='true'){expandIsland(false);document.querySelector('#island-outline').focus();}});
-
+let frame,headings=[],positions=[];
 function measure(){
   const mode=document.body.dataset.mode;
   const selector=mode==='source'?'#source-body':mode==='translation'?'#translation-body':'#parallel-body .pair-source';
   headings=[...document.querySelectorAll(selector+' h2,'+selector+' h3')];
-  positions=headings.map(h=>h.getBoundingClientRect().top+scrollY);
-  const links=document.querySelector('#island-links');links.replaceChildren();
-  headings.forEach(heading=>{
-    const link=document.createElement('a');link.href='#'+heading.id;link.textContent=heading.textContent.replace(/\s*¶\s*$/,'');if(heading.tagName==='H3')link.className='subheading';
-    link.onclick=event=>{event.preventDefault();expandIsland(false);heading.scrollIntoView({block:'start',behavior:reduced()?'instant':'smooth'});const url=new URL(location.href);url.hash=heading.id;history.replaceState(null,'',url);};links.append(link);
-  });
-  range=Math.max(1,document.documentElement.scrollHeight-innerHeight);
+  positions=headings.map(heading=>heading.getBoundingClientRect().top+scrollY);
+  const toc=document.querySelector('#reading-toc');toc.replaceChildren();
+  const label=document.createElement('p');label.textContent=headings.length?'本篇内容':'当前正文没有分节标题';toc.append(label);
+  for(const heading of headings){
+    const link=document.createElement('a');link.href='#'+heading.id;link.textContent=heading.textContent.replace(/\s*¶\s*$/,'');
+    if(heading.tagName==='H3')link.className='subheading';toc.append(link);
+  }
   requestUpdate();
 }
 function update(){
-  frame=null;
-  const progress=Math.min(1,Math.max(0,scrollY/range)),percent=Math.round(progress*100);
-  const scrolled=scrollY>250&&scrollY<range-100;
-  if(document.body.dataset.scrolled!==String(scrolled)){
-    document.body.dataset.scrolled=String(scrolled);
-    document.querySelector('#main-header').inert=scrolled;
-    island.inert=!scrolled;if(!scrolled)expandIsland(false);
-  }
-  if(lastProgress!==percent){
-    lastProgress=percent;document.querySelector('.reading-progress').style.setProperty('--reading-progress',progress);
-    document.querySelector('.reading-progress').setAttribute('aria-valuenow',percent);
-  }
-  const headingOffset=headings.length?parseFloat(getComputedStyle(headings[0]).scrollMarginTop)||120:120;
-  let index=-1;for(let i=0;i<positions.length;i++){if(positions[i]<=scrollY+headingOffset+1)index=i;else break;}
-  const title=document.querySelector('#title').textContent;
-  if(document.querySelector('#island-title').textContent!==title)document.querySelector('#island-title').textContent=title;
-  document.querySelectorAll('#outline-links a,#island-links a').forEach(link=>{
+  frame=null;let index=-1;
+  for(let i=0;i<positions.length;i++){if(positions[i]<=scrollY+115)index=i;else break;}
+  document.querySelectorAll('#outline-links a,#reading-toc a').forEach(link=>{
     if(index>=0&&link.hash==='#'+headings[index].id)link.setAttribute('aria-current','location');else link.removeAttribute('aria-current');
   });
 }
 function requestUpdate(){if(!frame)frame=requestAnimationFrame(update);}
-addEventListener('scroll',requestUpdate,{passive:true});
-addEventListener('resize',measure,{passive:true});
+addEventListener('scroll',requestUpdate,{passive:true});addEventListener('resize',measure,{passive:true});
 const resize=new ResizeObserver(measure);resize.observe(document.querySelector('#article'));
 
 const codeObserver=new IntersectionObserver(entries=>{

@@ -6,6 +6,7 @@ import Layout from '@/layouts/Base.astro';
 <div class="publication-ui">
 <header class="page-heading"><div><div class="eyeline">本地博客准备</div><h1>公开笔记预览</h1><p>选择自己的笔记，核对读者将看到的内容，再生成固定版本。此页不调用模型或部署。</p></div></header>
 <nav class="workspace-tabs" aria-label="发布视图"><a href="/publication" aria-current="page">公开快照</a><a href="/reading-builds">阅读站构建</a></nav>
+<p id="pub-demo" role="status" hidden>隔离演示 · 测试笔记和测试确认，不进入正式博客。</p>
 <p id="pub-message" role="status"></p><p id="pub-error" role="alert"></p>
 <section class="terminal-panel"><div class="panel-body">
 <label for="pub-source">选择已保存原文的资料</label><select id="pub-source"><option value="">读取资料…</option></select>
@@ -29,7 +30,7 @@ import Layout from '@/layouts/Base.astro';
 <div id="pub-preview" hidden><p id="pub-stale" role="status"></p><article class="pub-article"><h2 id="pub-title"></h2><div id="pub-body" class="pub-note-body"></div><p id="pub-source-detail" class="subtle"></p></article><details><summary>来源与已选择的其他字段</summary><dl id="pub-fields"></dl></details>
 <details><summary>完整公开 JSON / 实际导出的笔记字段</summary><pre id="pub-json"></pre></details>
 <p class="subtle" id="pub-hash"></p><h3>确认前检查</h3><ul id="pub-blockers"></ul>
-<label class="pub-check"><input id="pub-confirm" type="checkbox"/> 我已逐项核对这一版，并确认这些内容可以公开。</label>
+<label class="pub-check"><input id="pub-confirm" type="checkbox"/> <span id="pub-confirm-label">我已核对这一版的内容和公开范围。</span></label>
 <label class="pub-check" id="pub-rights-label" hidden><input id="pub-rights" type="checkbox"/> 我已核实所选摘录的公开使用依据。</label>
 <div class="pub-links"><button id="pub-approve">确认这一版</button><button id="pub-export-preview">下载未批准预览</button><button id="pub-export-approved" class="primary">下载已确认快照</button></div>
 <p class="subtle">确认与下载都不会上线。“未批准预览”不应交给公开站点构建；导出成功也不表示已经发布。</p></div>

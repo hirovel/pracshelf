@@ -7,6 +7,7 @@ import uuid
 import httpx
 import pytest
 from fastapi.testclient import TestClient
+from lxml.html import fromstring
 from test_curation import capture
 from test_publication import accept, approve, curate, preview
 
@@ -122,7 +123,11 @@ def test_real_astro_build_renders_note_only_markdown_without_private_or_active_c
         job = client.post("/api/reading-builds", json=request([p["id"]])).json()
         assert job["status"] == "succeeded", job
         article = client.get(job["preview_url"] + f"notes/{p['public_note']['note_id']}/")
-        assert '<h2>实际观察</h2>' in article.text and '<li>第一项</li>' in article.text
+        page = fromstring(article.text)
+        heading = page.xpath("//div[@class='note-body']/h2")[0]
+        assert heading.text_content() == '实际观察'
+        assert '#' + heading.attrib['id'] in page.xpath("//aside[@class='article-toc']//a/@href")
+        assert '<li>第一项</li>' in article.text
         assert '<pre><code class="language-python">' in article.text
         assert '    return 1' in article.text
         assert '<script' not in article.text and '<img ' not in article.text

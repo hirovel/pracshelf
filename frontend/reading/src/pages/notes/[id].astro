@@ -1,18 +1,20 @@
 ---
 import Reading from '../../layouts/Reading.astro';
 import {collection,dateLabel} from '../../lib/content.mjs';
-import {renderNote,noteExcerpt} from '../../../markdown.mjs';
+import {renderNoteDocument,noteExcerpt} from '../../../markdown.mjs';
 export function getStaticPaths(){return collection.notes.map(({note,hash})=>({params:{id:note.note_id},props:{note,hash}}));}
 const {note,hash}=Astro.props;
-const noteHtml=renderNote(note.note);
+const {html:noteHtml,outline}=renderNoteDocument(note.note);
 const hasConditions=note.freshness!=='适用性待核实'||note.trial!=='未试用'||note.applicability||note.checked_on;
 ---
 <Reading rootHref="../../" title={note.title+' · PracShelf'} description={noteExcerpt(note.note,160)}>
-<article><a class="back" href="../../">← 全部笔记</a><header class="article-head">{note.category!=='未分类'&&<p class="eyebrow">{note.category}</p>}<h1>{note.title}</h1><p class="meta">笔记更新 <time datetime={note.note_updated_at}>{dateLabel(note.note_updated_at)}</time> · {collection.demo?'测试笔记':'个人笔记'}</p></header>
+<header slot="hero" class="article-head"><div class="hero-inner"><a class="back" href="../../">笔记 / 全部笔记 ↗</a><h1>{note.title}</h1><p class="hero-kind">{note.category!=='未分类'?note.category:'阅读笔记'}</p></div></header>
+<div class="article-layout"><aside class="article-toc" aria-label="笔记目录">{outline.length>0&&<nav><p>本篇内容</p><ol>{outline.map(item=><li class:list={[item.level===3&&'subheading']}><a href={'#'+item.id}>{item.title}</a></li>)}</ol></nav>}</aside>
+<article><div class="article-meta"><div><span>内容</span><p>{collection.demo?'工程演示笔记':'个人笔记'}</p></div><div><span>笔记更新</span><p><time datetime={note.note_updated_at}>{dateLabel(note.note_updated_at)}</time></p></div></div>
 <div class="note-body" set:html={noteHtml}></div>
 {note.purpose&&<section class="article-section"><h2>为什么留下</h2><p class="preserve">{note.purpose}</p></section>}
 {hasConditions&&<section class="scope"><h2>条件与核查</h2><p>{note.freshness!=='适用性待核实'&&note.freshness}{note.freshness!=='适用性待核实'&&note.trial!=='未试用'&&' · '}{note.trial!=='未试用'&&note.trial}</p>{note.applicability&&<p class="preserve">{note.applicability}</p>}{note.checked_on&&<p class="meta">核查日期：{dateLabel(note.checked_on)}</p>}</section>}
 {note.quote&&<section class="article-section"><h2>所选原文依据</h2><blockquote>{note.quote}</blockquote><p class="muted">摘录只呈现局部，请结合完整原文理解。</p></section>}
 <section class="source"><h2>原始出处</h2><a href={note.source_url} rel="noopener noreferrer">{note.source_url}</a><p class="meta">原文日期：{note.source_date_status==='unknown'?'未核对':dateLabel(note.source_date)+'（人工核对记录）'}</p></section>
 <details class="snapshot"><summary>这一版的内容标识</summary><p>SHA-256</p><code>{hash}</code><p>内容标识用于核对版本，不证明原文观点正确。</p></details>
-</article></Reading>
+</article><div class="article-gutter" aria-hidden="true"></div></div></Reading>

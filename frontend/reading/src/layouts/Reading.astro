@@ -1,11 +1,11 @@
 ---
 import {collection} from '../lib/content.mjs';
 import '../styles.css';
-const {title='PracShelf',description='AI 开发实践的个人笔记、原始出处与适用性记录。',rootHref='./'}=Astro.props;
+const {title='PracShelf',description='AI 开发实践的个人笔记与来源。',rootHref='./'}=Astro.props;
 ---
 <!doctype html><html lang="zh-CN"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><meta name="description" content={description}/><meta name="robots" content="noindex,nofollow"/><title>{title}</title></head>
 <body><a class="skip" href="#main">跳到正文</a>
 {collection.demo&&<aside class="demo-banner">演示站 · 测试笔记与测试确认，不计入真实成果</aside>}
-<div class="site"><header class="site-header"><a class="brand" href={rootHref}>PracShelf<span aria-hidden="true">_</span></a><nav aria-label="阅读导航"><a href={rootHref}>全部笔记</a><a href={rootHref+'about/'}>关于</a></nav></header>
-<main id="main"><slot/></main>
+<div class="site"><header class="site-header"><a class="brand" href={rootHref}>PracShelf<span class="brand-kind">笔记</span></a><nav aria-label="阅读导航"><a href={rootHref}>全部笔记</a><a href={rootHref+'about/'}>关于</a></nav></header>
+<main id="main"><slot name="hero"/><slot/></main>
 <footer><span>PracShelf</span><span>{collection.demo?'隔离演示 · 本地验收':'本地阅读预览 · 尚未部署'}</span></footer></div></body></html>

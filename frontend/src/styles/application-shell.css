@@ -7,8 +7,9 @@
 .app-header #theme{background:none;border:0;color:#9da8b8;display:grid;place-items:center;padding:5px;cursor:pointer}.app-header svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.3}
 .terminal-app .terminal-shell{display:flex;flex:1;min-height:0}.terminal-app .workspace-editor{flex:1}.terminal-app{font-family:Inter,'Microsoft YaHei',sans-serif}.terminal-app .terminal-main{width:100%;max-width:1382px;margin:0 auto}.terminal-app .workspace-document-tab{font-family:Inter,'Microsoft YaHei',sans-serif}
 html[data-theme=dark]:has(.terminal-app){--paper:oklch(14.68% .01 262.04);--canvas:oklch(12.92% .005 262.04);--ink:oklch(93.66% .027 262.04);--muted:oklch(77.16% .028 262.04);--line:oklch(24.84% .018 262.04);--accent:oklch(81.53% .078 262.04)}
-.reading-blog>.app-header{position:fixed;inset:0 0 auto}.reading-blog .dock-header,.reading-blog .reading-island{top:80px}.reading-blog .dock{width:min(280px,calc(100vw - 32px))}.reading-blog[data-view=library] .dock{width:auto}.reading-blog .app-header{font-size:12px}
-.reading-blog .prose :is(h2,h3){scroll-margin-top:154px}
-@media(max-width:720px){.app-header{padding:8px 16px;gap:6px 14px;flex-wrap:wrap;min-height:86px}.app-brand{font-size:12px}.app-document{display:none}.app-navigation{order:3;flex-basis:100%;gap:3px}.app-navigation a{font-size:11px;padding:5px 11px}.app-publishing{margin-left:auto}.app-header #theme{margin-left:0}.reading-blog .dock-header,.reading-blog .reading-island{top:108px}.reading-blog[data-view=library] .library-page{padding-top:176px}}
+.reading-blog>.app-header{position:sticky;inset:0 0 auto;color:#20262b;background:#f6f6f3;border-bottom-color:#dce0da;font-size:12px}
+.reading-blog .app-document,.reading-blog .app-publishing small{color:#687078}.reading-blog .app-navigation a[aria-current=page],.reading-blog .app-navigation a:hover,.reading-blog .app-publishing summary:hover{background:#e9ebe6}.reading-blog .app-publishing nav{background:#fff;border-color:#dce0da;box-shadow:0 8px 24px #13221a16}.reading-blog .app-publishing nav a:hover{background:#eeefeb}
+.reading-blog .prose :is(h2,h3){scroll-margin-top:100px}
+@media(max-width:720px){.app-header{padding:8px 16px;gap:6px 14px;flex-wrap:wrap;min-height:86px}.app-brand{font-size:12px}.app-document{display:none}.app-navigation{order:3;flex-basis:100%;gap:3px}.app-navigation a{font-size:11px;padding:5px 11px}.app-publishing{margin-left:auto}.app-header #theme{margin-left:0}}
 @media(prefers-reduced-motion:no-preference){.app-navigation a{transition:background-color .15s}}
-@media(max-width:720px){.reading-blog .prose :is(h2,h3){scroll-margin-top:184px}}
+@media(max-width:720px){.reading-blog .prose :is(h2,h3){scroll-margin-top:130px}}

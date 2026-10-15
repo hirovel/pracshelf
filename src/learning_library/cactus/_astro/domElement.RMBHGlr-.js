@@ -1,1 +1,0 @@
-function e(e,t){e.classList.toggle(t)}function t(){return document.documentElement.getAttribute(`data-theme`)===`dark`}export{e as n,t};

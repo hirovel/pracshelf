@@ -8,6 +8,7 @@ PracShelf 是本地文章阅读与笔记工具。支持 AI 实践资料筛选、
 - 采集模块保存原始响应和正文版本。旧版本保留。
 - 模型在一次任务中判断阅读价值并提取核心内容。提取结果附原文引文。
 - 翻译按需执行。阅读页支持原文、中文和左右对照。
+- 阅读页和笔记博客提供章节目录。
 - 流程页显示阶段状态、输入、结果和错误。失败阶段可单独重试。
 - 调用记录显示输入、缓存读取、输出 tokens 和耗时。完整日志按需加载。
 - 笔记保存为 Markdown。支持历史版本、导出和静态博客构建。
@@ -127,7 +128,7 @@ uv sync --locked --extra deepseek --no-dev
 uv sync --locked
 uv run pytest -q
 uv run ruff check src tests examples/curation_demo.py
-node --test frontend/src/scripts/navigation-context.test.mjs frontend/src/scripts/library-view.test.mjs frontend/reading/markdown.test.mjs frontend/reading/snapshots.test.mjs
+node --test frontend/scripts/publish.test.mjs frontend/src/scripts/navigation-context.test.mjs frontend/src/scripts/library-view.test.mjs frontend/reading/markdown.test.mjs frontend/reading/snapshots.test.mjs
 ```
 
 测试使用隔离目录和模拟模型。覆盖版本绑定、重复提交、失败重试、引文定位、笔记导出、快照隔离、构建和备份恢复。

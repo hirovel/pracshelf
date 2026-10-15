@@ -23,6 +23,10 @@ function buttons() {
 }
 function render() {
   const p=state.latest;
+  const demo=state.origin==='demo';
+  element('demo').hidden=!demo;
+  element('confirm-label').textContent=demo?'我已核对这份工程测试内容。':'我已核对这一版的内容和公开范围。';
+  element('approve').textContent=demo?'测试确认这一版':'确认这一版';
   document.dispatchEvent(new CustomEvent('workspace:document',{detail:{runId:run,title:state.title,readable:!!state.input?.version_id}}));
   element('private').replaceChildren(...state.private_fields.map((v:string)=>{const li=document.createElement('li');li.textContent=v;return li;}));
   for(const id of ['note','purpose','quote']) element(id+'-hint').textContent=state.available_fields[id]?'已保存':'尚未填写';
@@ -36,7 +40,7 @@ function render() {
     d.append(s,(globalThis as any).savedRecordView.render(entry));return d;
   }));
   if(p){
-    element('state').textContent=p.current?(p.approval?'本地已确认 · 未部署':'未批准预览 · 未部署'):'历史预览 · 需更新';
+    element('state').textContent=p.current?(p.approval?(demo?'测试已确认 · 未部署':'本地已确认 · 未部署'):'未批准预览 · 未部署'):'历史预览 · 需更新';
     element('title').textContent=p.public_note.title;
     element('body').innerHTML=renderNote(p.public_note.note);
     element('source-detail').textContent='参考来源：'+p.public_note.source_url;
@@ -51,7 +55,7 @@ function render() {
     element('rights-label').hidden=!p.public_note.quote;
   } else element('state').textContent='尚未生成预览';
   element('step-2').textContent=p?'02 预览已生成':'02 等待生成预览';
-  element('step-3').textContent=p?.approval?'03 本地已确认':'03 等待本人确认';
+  element('step-3').textContent=p?.approval?(demo?'03 测试已确认':'03 本地已确认'):(demo?'03 等待测试确认':'03 等待本人确认');
   element('step-4').textContent=p?.exports.length?'04 已导出 · 未部署':'04 等待导出';
   buttons();
 }

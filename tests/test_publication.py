@@ -42,6 +42,24 @@ def curate(client, base, **changes):
     ).json()
 
 
+@pytest.mark.parametrize("origin", ["human", "demo"])
+def test_publication_mode_is_known_before_a_note_or_preview_exists(tmp_path, origin):
+    article = "# Synthetic source\n\n" + "Preserve the source. " * 30
+    app = create_app(
+        tmp_path,
+        httpx.MockTransport(lambda request: httpx.Response(
+            200, text=article, headers={"Content-Type": "text/markdown"}
+        )),
+        review_origin=origin,
+    )
+    with TestClient(app) as client:
+        base = capture(client)
+        state = client.get(base + "/publication").json()
+        assert state["origin"] == origin
+        assert state["latest"] is None
+        assert state["model_calls"] == 0
+
+
 def accept(client, base):
     state = client.get(base + "/reviews").json()
     return client.post(

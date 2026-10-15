@@ -154,6 +154,7 @@ class Publication:
         personal = state["latest"]["payload"] if state["latest"] else {}
         return {
             "run_id": run_id,
+            "origin": self.origin,
             "input": binding,
             "title": version["document"]["title"],
             "available_fields": {k: bool(personal.get(k)) for k in ("note", "purpose", "quote")},

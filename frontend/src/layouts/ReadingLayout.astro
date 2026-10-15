@@ -7,13 +7,11 @@ const {title='阅读',view='article'}=Astro.props;
 <!doctype html><html lang="zh-CN"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="preload" as="font" href={interFont} type="font/woff2" crossorigin="anonymous"/><link rel="stylesheet" href="/assets/record-view.css"/><link rel="stylesheet" href="/curation.css"/><title>{title} · PracShelf</title></head>
 <body class="reading-blog" data-mode="parallel" data-view={view}>
 <a class="skip-link" href="#main">跳到正文</a>
-<ApplicationHeader/>
-<header id="main-header" class="dock-header"><nav class="dock" aria-label={view==='library'?'资料导航':'阅读导航'}>
-  <span class="dock-highlight" aria-hidden="true"></span>
-  <button class="library-mark" id="reading-top" aria-label="回到页首"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h7l7 4v12l-7-4H5z M12 4v12 M5 4v12"/></svg></button>
-  {view==='library'?<button id="library-search">搜索资料</button>:<><button id="reading-outline" disabled>目录</button><button id="reading-records" disabled>记录</button><button id="reading-notes" disabled>笔记</button></>}
-</nav></header>
-{view==='article'&&<div class="reading-island" data-expanded="false" aria-label="阅读进度与目录"><button id="island-outline" aria-label="展开文章目录" aria-expanded="false" aria-controls="island-links"><svg class="reading-progress" viewBox="0 0 20 20" role="progressbar" aria-label="文章阅读位置" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><circle cx="10" cy="10" r="7.5"/><circle class="reading-progress-fill" cx="10" cy="10" r="7.5"/></svg><span id="island-title"></span><span class="island-chevron" aria-hidden="true">⌄</span></button><div class="island-menu"><nav id="island-links" aria-label="滚动阅读目录" inert></nav><button id="island-top">回到页首 ↑</button></div></div>}
+<ApplicationHeader id="main-header"/>
+<nav class="reader-tools" aria-label={view==='library'?'资料导航':'阅读导航'}>
+  <button id="reading-top" aria-label="回到页首">↑ 页首</button>
+  {view==='library'?<button id="library-search">搜索资料</button>:<><button id="reading-outline" disabled>目录</button><button id="reading-records" disabled>运行记录</button><button id="reading-notes" disabled>我的笔记</button></>}
+</nav>
 <main id="main"><slot/></main><slot name="scripts"/>
-<script>import '@/scripts/dock.js';</script>
+<script>document.querySelector('#reading-top')?.addEventListener('click',()=>window.scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'}));</script>
 </body></html>
