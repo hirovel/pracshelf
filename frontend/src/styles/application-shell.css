@@ -1,17 +1,45 @@
-/* Shared private application navigation. Public snapshots have a separate build. */
-@font-face{font-family:Inter;src:url('../assets/fonts/InterVariable.woff2') format('woff2');font-weight:100 900;font-display:swap}
-.app-header{position:relative;z-index:110;flex-shrink:0;display:flex;align-items:center;gap:22px;min-height:56px;padding:0 26px;color:#dfe5ee;background:#171a21;border-bottom:1px solid #2b313d;font:12px/1.8 Inter,'Microsoft YaHei',sans-serif}
-.app-header *{box-sizing:border-box}.app-header a{color:inherit!important;text-decoration:none;white-space:nowrap}.app-brand{font-size:13px;flex-shrink:0}.app-document{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#9da8b8;font-size:11px;min-width:0}
-.app-navigation{display:flex;align-items:center;gap:6px}.app-navigation a{padding:7px 13px;border-radius:5px}.app-navigation a[aria-current=page],.app-navigation a:hover,.app-publishing summary:hover{background:#ffffff0d}.app-navigation a[hidden]{display:none!important}
-.app-header :focus-visible{outline:2px solid #a3bfee;outline-offset:3px}.app-publishing{position:relative}.app-publishing summary{list-style:none;cursor:pointer;padding:7px 8px;border-radius:5px;font-size:11px}.app-publishing summary::-webkit-details-marker{display:none}.app-publishing nav{position:absolute;right:0;top:40px;min-width:175px;display:grid;gap:4px;padding:10px;background:#1e232d;border:1px solid #353e4b;border-radius:7px;box-shadow:0 8px 24px #0005}.app-publishing nav a{padding:6px 8px}.app-publishing nav a:hover{background:#ffffff0d}.app-publishing small{padding:8px;color:#9da8b8;font-size:10px}
-.app-header #theme{background:none;border:0;color:#9da8b8;display:grid;place-items:center;padding:5px;cursor:pointer}.app-header svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.3}
-.terminal-app .terminal-shell{display:flex;flex:1;min-height:0}.terminal-app .workspace-editor{flex:1}.terminal-app{font-family:Inter,'Microsoft YaHei',sans-serif}.terminal-app .terminal-main{width:100%;max-width:1382px;margin:0 auto}.terminal-app .workspace-document-tab{font-family:Inter,'Microsoft YaHei',sans-serif}
-html[data-theme=dark]:has(.terminal-app){--paper:oklch(14.68% .01 262.04);--canvas:oklch(12.92% .005 262.04);--ink:oklch(93.66% .027 262.04);--muted:oklch(77.16% .028 262.04);--line:oklch(24.84% .018 262.04);--accent:oklch(81.53% .078 262.04)}
-.reading-blog>.app-header{position:sticky;inset:0 0 auto;color:#20262b;background:#f6f6f3;border-bottom-color:#dce0da;font-size:12px}
-.reading-blog .app-document,.reading-blog .app-publishing small{color:#687078}.reading-blog .app-navigation a[aria-current=page],.reading-blog .app-navigation a:hover,.reading-blog .app-publishing summary:hover{background:#e9ebe6}.reading-blog .app-publishing nav{background:#fff;border-color:#dce0da;box-shadow:0 8px 24px #13221a16}.reading-blog .app-publishing nav a:hover{background:#eeefeb}
-.reading-blog .prose :is(h2,h3){scroll-margin-top:100px}
-@media(max-width:720px){.app-header{padding:8px 16px;gap:6px 14px;flex-wrap:wrap;min-height:86px}.app-brand{font-size:12px}.app-document{display:none}.app-navigation{order:3;flex-basis:100%;gap:3px}.app-navigation a{font-size:11px;padding:5px 11px}.app-publishing{margin-left:auto}.app-header #theme{margin-left:0}}
+/* Shared navigation for catalogue, reading and processing. */
+@import '../../shared/theme.css';
+
+.app-header {
+ position:sticky;top:0;z-index:110;flex-shrink:0;
+ display:flex;align-items:center;gap:22px;min-height:56px;padding:0 26px;
+ color:var(--ink);background:var(--canvas);border-bottom:1px solid var(--line);
+ font:12px/1.8 var(--font-display);
+}
+.app-header *{box-sizing:border-box}
+.app-header a{color:inherit!important;text-decoration:none;white-space:nowrap}
+.app-brand{font-size:13px;flex-shrink:0}
+.app-document{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);font-size:11px;min-width:0}
+.app-navigation{display:flex;align-items:center;gap:6px}
+.app-navigation a{padding:7px 13px;border-radius:5px}
+.app-navigation a[hidden]{display:none!important}
+.app-navigation a[aria-current=page],.app-navigation a:hover,
+.app-publishing summary:hover,.app-publishing nav a:hover,
+.app-publishing:has([aria-current=page])>summary,.app-publishing nav a[aria-current=page]{background:var(--wash)}
+.app-header :focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.app-publishing{position:relative}
+.app-publishing summary{list-style:none;cursor:pointer;padding:7px 8px;border-radius:5px;font-size:11px}
+.app-publishing summary::-webkit-details-marker{display:none}
+.app-publishing nav{position:absolute;right:0;top:40px;min-width:175px;display:grid;gap:4px;padding:10px;background:var(--canvas);border:1px solid var(--line);border-radius:7px;box-shadow:0 8px 24px #0003}
+.app-publishing nav a{padding:6px 8px}
+.app-publishing small{padding:8px;color:var(--muted);font-size:10px}
+.app-header #theme{background:none;border:0;color:var(--muted);display:grid;place-items:center;padding:5px;cursor:pointer}
+.app-header svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.3}
+
+.terminal-app .terminal-shell{display:flex;flex:1;min-height:0}
+.terminal-app .workspace-editor{flex:1}
+.terminal-app,.terminal-app .workspace-document-tab{font-family:var(--font-display)}
+.terminal-app .terminal-main{width:100%;max-width:1382px;margin:0 auto}
+.reading-blog .prose :is(h2,h3){scroll-margin-top:112px}
+
+@media(max-width:720px){
+ .app-header{padding:8px 16px;gap:6px 14px;flex-wrap:wrap;min-height:86px}
+ .app-brand{font-size:12px}.app-document{display:none}
+ .app-navigation{order:3;flex-basis:100%;gap:3px}
+ .app-navigation a{font-size:11px;padding:5px 11px}
+ .app-publishing{margin-left:auto}.app-header #theme{margin-left:0}
+ .reading-blog .prose :is(h2,h3){scroll-margin-top:144px}
+}
 @media(prefers-reduced-motion:no-preference){.app-navigation a{transition:background-color .15s}}
-/* Explicit local preference also covers browsers whose system preference is unchanged. */
 html[data-motion=reduce],html[data-motion=reduce] *,html[data-motion=reduce] *::before,html[data-motion=reduce] *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
-@media(max-width:720px){.reading-blog .prose :is(h2,h3){scroll-margin-top:130px}}

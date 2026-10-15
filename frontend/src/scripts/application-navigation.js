@@ -4,7 +4,8 @@ let saved={};try{saved=JSON.parse(sessionStorage.getItem('workspace-document')||
 let context=resolveContext(location.pathname,location.search,saved);
 export function currentRun(){return context.runId||null;}
 const path=location.pathname,active=path==='/'?'library':path.startsWith('/read/')?'reading'
-  :['/inbox','/search'].includes(path)?'collect':path==='/pipeline'?'pipeline':path.startsWith('/setup')?'setup':null;
+  :['/inbox','/search'].includes(path)?'collect':path==='/pipeline'?'pipeline':path.startsWith('/setup')?'setup'
+  :path==='/publication'?'publication':path==='/reading-builds'?'builds':null;
 function render() {
   const links=navigation(context);
   document.querySelectorAll('[data-app-route]').forEach(anchor=>{

@@ -327,7 +327,9 @@ class ReadingBuilds:
         if not parts or any(p in {"..", "."} for p in parts) or "\\" in name:
             raise ValueError("产物路径无效。")
         allowed = {a["file"]: a for a in json.loads(row["report"])["artifacts"]}
-        if name not in allowed or Path(name).suffix not in {".html", ".css"}:
+        if name not in allowed or (
+            Path(name).suffix not in {".html", ".css", ".woff2"} and name != "FONT_LICENSES.txt"
+        ):
             raise ValueError("此文件不属于公开阅读产物。")
         root = self.root / id / "site"
         path = root.joinpath(*parts)

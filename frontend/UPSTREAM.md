@@ -2,9 +2,9 @@
 
 ## Current article presentation
 
-The current reader and standalone notes use a paper background, a dark title area, a narrow reading column and section navigation. The visual reference is [ChipAgents Build-A-Chip-Bench](https://chipagents.ai/research/build-a-chip-bench). Styles and templates are authored locally. ChipAgents text, logo, illustrations, chart data and commercial fonts are not included.
+The catalogue, reader and workbench share a dark theme, local fonts and navigation. Reading typography and code styles restore the earlier Maxime adaptation. Standalone notes use a compact single column with the same visual tokens. No external article content or private records are included in the software.
 
-The earlier Maxime adaptation below records the source of retained font assets and code interactions. Its floating dock and expanding island have been replaced with ordinary reader actions and a section sidebar. The historical measurements are not a claim about the current design.
+The Maxime adaptation below records the source of retained font assets and code interactions. Its floating dock and expanding island have been replaced with a shared header and reading tools. Historical measurements describe the earlier comparison.
 
 Source: https://github.com/chrismwilliams/astro-theme-cactus
 Commit: 728f1f4eeb80208398649261d7635f311cafa011
@@ -12,9 +12,9 @@ License: MIT, Copyright (c) 2022 Chris Williams. Full text in LICENSE.
 
 Retained upstream source: Header, Footer, ThemeToggle, ThemeProvider, SkipLink, domElement, global.css and style dependencies, tailwind.config.ts. The active Base layout now uses a locally authored terminal shell and terminal.css. The upstream header/footer/theme controls are retained for provenance but no longer rendered. SkipLink, Tailwind setup, typography and foundational CSS remain in use in workbench pages. The private catalogue no longer uses PostPreview-derived markup.
 
-The dashboard, candidates page and their UI scripts live in frontend/src. Workbench markup and runtime scripts remain in src/learning_library. Astro builds the pages; FastAPI serves compiled pages and data APIs from the same origin. No Astro server is required at runtime. Local terminal styling is an adaptation, not an upstream Cactus design.
+Active pages and their UI scripts live in frontend/src. Legacy candidate and workbench URLs redirect to the pipeline. Astro builds the pages; FastAPI serves compiled pages and data APIs from the same origin. No Astro server is required at runtime. Local terminal styling is an adaptation, not an upstream Cactus design.
 
-## Earlier private reader: Maxime Heckel reference
+## Private reader: Maxime Heckel reference
 
 Source: https://github.com/MaximeHeckel/blog.maximeheckel.com (revision ccbb3def76870a1b8feaa4506c5877d24fd7bdfd, inspected 2026-10-11).
 Code license: MIT, Copyright (c) 2024 Maxime Heckel; full notice in licenses/MaximeHeckel.MIT.txt, included with the compiled assets. Pinned source URLs, revision and SHA256 fingerprints are captured in ../.scratch/maxime-fidelity/upstream/. Earlier exploratory references remain in ../.scratch/learning-reader/upstream-maxime/.
@@ -31,4 +31,9 @@ This is an Astro adaptation, not the upstream Next.js/MDX application or a full 
 
 Pixel comparisons use the same viewport and compare measured typography and dimensions. Article text, local navigation labels, provenance, core controls and bilingual mode differ from the upstream content, so the complete page is not claimed to be an identical screenshot. See ../docs/maxime-fidelity-2026-10-11.md for measured results and retained functional differences.
 
-The independent reading site in reading/ uses the same installed Astro dependency, with locally authored templates and a minimal light reading stylesheet. It does not import the workbench layout or scripts. Its output and build records stay in separate data/reading-builds directories; no upstream theme authorship is claimed for these new pages.
+The independent reading site in reading/ uses the same installed Astro dependency, locally authored templates and shared theme tokens. It does not import the workbench layout or scripts. Its output and build records stay in separate data/reading-builds directories; no upstream theme authorship is claimed for these new pages.
+
+
+## Reading appearance, 2026-10-15
+
+The reader restores the earlier Maxime-inspired dark typography and code presentation. A shared theme.css now supplies colors and fonts to the catalogue, reader, workbench and standalone notes. The standalone note layout returns to a compact single column. ChipAgents was a visual reference in the previous iteration; its large title hero and paper palette are no longer used. No ChipAgents source code or assets are included. The shared application header replaces the earlier floating dock. Safe Markdown rendering, unique heading IDs, code copying and fixed source-version selection remain.

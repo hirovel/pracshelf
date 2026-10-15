@@ -6,18 +6,12 @@ function measure(){
   const selector=mode==='source'?'#source-body':mode==='translation'?'#translation-body':'#parallel-body .pair-source';
   headings=[...document.querySelectorAll(selector+' h2,'+selector+' h3')];
   positions=headings.map(heading=>heading.getBoundingClientRect().top+scrollY);
-  const toc=document.querySelector('#reading-toc');toc.replaceChildren();
-  const label=document.createElement('p');label.textContent=headings.length?'本篇内容':'当前正文没有分节标题';toc.append(label);
-  for(const heading of headings){
-    const link=document.createElement('a');link.href='#'+heading.id;link.textContent=heading.textContent.replace(/\s*¶\s*$/,'');
-    if(heading.tagName==='H3')link.className='subheading';toc.append(link);
-  }
   requestUpdate();
 }
 function update(){
   frame=null;let index=-1;
   for(let i=0;i<positions.length;i++){if(positions[i]<=scrollY+115)index=i;else break;}
-  document.querySelectorAll('#outline-links a,#reading-toc a').forEach(link=>{
+  document.querySelectorAll('#outline-links a').forEach(link=>{
     if(index>=0&&link.hash==='#'+headings[index].id)link.setAttribute('aria-current','location');else link.removeAttribute('aria-current');
   });
 }

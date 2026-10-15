@@ -1,0 +1,1 @@
+var e=document.getElementById(`theme`);e.onclick=()=>{let e=document.documentElement.dataset.theme===`dark`?`light`:`dark`;document.documentElement.dataset.theme=e;try{localStorage.setItem(`workspace-theme`,e)}catch{}};

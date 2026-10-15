@@ -4,14 +4,14 @@ import ApplicationHeader from '@/components/layout/ApplicationHeader.astro';
 import interFont from '@/assets/fonts/InterVariable.woff2?url';
 const {title='阅读',view='article'}=Astro.props;
 ---
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="preload" as="font" href={interFont} type="font/woff2" crossorigin="anonymous"/><link rel="stylesheet" href="/assets/record-view.css"/><link rel="stylesheet" href="/curation.css"/><script is:inline src="/assets/ui.js"></script><title>{title} · PracShelf</title></head>
+<!doctype html><html lang="zh-CN" data-theme="dark"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="preload" as="font" href={interFont} type="font/woff2" crossorigin="anonymous"/><link rel="stylesheet" href="/assets/record-view.css"/><link rel="stylesheet" href="/curation.css"/><script is:inline>try{document.documentElement.dataset.theme=localStorage.getItem('workspace-theme')||'dark'}catch{}</script><script is:inline src="/assets/ui.js"></script><title>{title} · PracShelf</title></head>
 <body class="reading-blog" data-mode="parallel" data-view={view}>
 <a class="skip-link" href="#main">跳到正文</a>
-<ApplicationHeader id="main-header"/>
+<ApplicationHeader id="main-header" workspace/>
 <nav class="reader-tools" aria-label={view==='library'?'资料导航':'阅读导航'}>
   <button id="reading-top" aria-label="回到页首">↑ 页首</button>
   {view==='library'?<button id="library-search">搜索资料</button>:<><button id="reading-outline" disabled>目录</button><button id="reading-records" disabled>运行记录</button><button id="reading-notes" disabled>我的笔记</button></>}
 </nav>
 <main id="main"><slot/></main><slot name="scripts"/>
-<script>declare const readingUI:{reduceMotion:()=>boolean};document.querySelector('#reading-top')?.addEventListener('click',()=>window.scrollTo({top:0,behavior:readingUI.reduceMotion()?'instant':'smooth'}));</script>
+<script>import '@/scripts/workspace-shell';declare const readingUI:{reduceMotion:()=>boolean};document.querySelector('#reading-top')?.addEventListener('click',()=>window.scrollTo({top:0,behavior:readingUI.reduceMotion()?'instant':'smooth'}));</script>
 </body></html>

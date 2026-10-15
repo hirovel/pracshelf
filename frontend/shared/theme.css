@@ -1,0 +1,21 @@
+/* Shared appearance for the local app and exported notes. */
+@font-face{font-family:Inter;src:url('../src/assets/fonts/InterVariable.woff2') format('woff2');font-weight:100 900;font-display:swap}
+@font-face{font-family:FiraCode;src:url('../src/assets/fonts/fira-code.woff2') format('woff2');font-weight:300 700;font-display:swap}
+:root,html[data-theme=dark]{
+ color-scheme:dark;
+ --paper:oklch(14.68% .01 262.04);--canvas:oklch(12.92% .005 262.04);
+ --ink:oklch(93.66% .027 262.04);--muted:oklch(77.16% .028 262.04);
+ --line:oklch(24.84% .018 262.04);--wash:oklch(17.8% .012 262.04);
+ --accent:oklch(81.53% .078 262.04);--tint:#25313b;
+ --danger:#f19d9d;--success:#a4c7a4;--warning:#d3b88c;
+ --font-display:Inter,'PingFang SC','Microsoft YaHei',sans-serif;
+ --font-code:FiraCode,Consolas,monospace;
+ --font-mono:ui-monospace,Consolas,monospace;
+ --color-global-bg:var(--paper);--color-global-text:var(--ink);--color-muted:var(--muted);
+ --color-accent:var(--accent);--color-accent-2:var(--ink);--color-link:var(--accent);--color-quote:var(--muted);
+}
+html[data-theme=light]{
+ color-scheme:light;--paper:#fafafa;--canvas:#f2f3f5;--ink:#242932;--muted:#5c6572;
+ --line:#dce0e6;--wash:#e9ecf1;--accent:#365d96;--tint:#eaf0f6;
+ --danger:#a83232;--success:#387147;--warning:#886321;
+}

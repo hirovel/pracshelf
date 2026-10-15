@@ -1,0 +1,1 @@
+import"./workspace-shell.BkyZJFmi.js";document.querySelector(`#reading-top`)?.addEventListener(`click`,()=>window.scrollTo({top:0,behavior:readingUI.reduceMotion()?`instant`:`smooth`}));

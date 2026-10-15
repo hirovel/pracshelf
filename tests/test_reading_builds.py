@@ -2,7 +2,9 @@
 
 import hashlib
 import json
+import re
 import uuid
+from urllib.parse import urljoin
 
 import httpx
 import pytest
@@ -88,6 +90,25 @@ def test_real_astro_build_exports_only_approved_fields_and_relative_navigation(s
         assert 'href="../../"' in article.text
         assert "PRIVATE_" not in article.text
         assert "记录方法，也记录条件" not in article.text
+        assert "default-src 'none'" in article.headers["content-security-policy"]
+        assert "font-src 'self'" in article.headers["content-security-policy"]
+        font_urls = re.findall(r'url\([\'"]?([^\)\'"\s]+\.woff2)', article.text)
+        assert font_urls
+        for url in font_urls:
+            resolved = urljoin(str(article.url), url)
+            assert resolved.startswith(str(home.url))
+            assert client.get(resolved).status_code == 200
+        fonts = [a for a in job["report"]["artifacts"] if a["file"].endswith(".woff2")]
+        assert fonts
+        for font in fonts:
+            response = client.get(job["preview_url"] + font["file"])
+            assert response.status_code == 200
+            assert response.headers["content-type"] == "font/woff2"
+            assert response.content.startswith(b"wOF2")
+            assert hashlib.sha256(response.content).hexdigest() == font["sha256"]
+        notices = client.get(job["preview_url"] + "FONT_LICENSES.txt")
+        assert notices.status_code == 200
+        assert "SIL OPEN FONT LICENSE" in notices.text
         assert client.get(job["preview_url"] + "about/").status_code == 200
         for path in (
             "report.json",
@@ -126,7 +147,7 @@ def test_real_astro_build_renders_note_only_markdown_without_private_or_active_c
         page = fromstring(article.text)
         heading = page.xpath("//div[@class='note-body']/h2")[0]
         assert heading.text_content() == '实际观察'
-        assert '#' + heading.attrib['id'] in page.xpath("//aside[@class='article-toc']//a/@href")
+        assert '#' + heading.attrib['id'] in page.xpath("//nav[@aria-label='笔记目录']//a/@href")
         assert '<li>第一项</li>' in article.text
         assert '<pre><code class="language-python">' in article.text
         assert '    return 1' in article.text

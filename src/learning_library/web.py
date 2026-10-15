@@ -359,8 +359,9 @@ def create_app(
                 raise HTTPException(404, str(error)) from error
             return FileResponse(
                 path,
+                media_type="font/woff2" if path.suffix == ".woff2" else None,
                 headers={
-                    "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'",
+                    "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; font-src 'self'; base-uri 'none'; form-action 'none'",
                     "X-Content-Type-Options": "nosniff",
                     "Cache-Control": "no-store",
                 },

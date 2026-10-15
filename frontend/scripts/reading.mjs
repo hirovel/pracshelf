@@ -33,16 +33,25 @@ async function build(){
     execFileSync(process.execPath,[join(frontend,'node_modules','astro','bin','astro.mjs'),'build','--config','astro.config.mjs'],{
       cwd:join(frontend,'reading'),env:{...process.env,ASTRO_TELEMETRY_DISABLED:'1',READING_MANIFEST:manifest,READING_OUTPUT:site},stdio:'inherit',windowsHide:true,timeout:70000,
     });
-    const expected=new Set(['index.html','about/index.html','404.html',...content.notes.map(({note})=>`notes/${note.note_id}/index.html`)]);
+    const notices=await Promise.all(['Inter.OFL.txt','FiraCode.OFL.txt'].map(name=>readFile(join(frontend,'licenses',name),'utf8')));
+    await writeFile(join(site,'FONT_LICENSES.txt'),notices.join('\n\n'));
+    const expected=new Set(['index.html','about/index.html','404.html','FONT_LICENSES.txt',...content.notes.map(({note})=>`notes/${note.note_id}/index.html`)]);
     const artifacts=[];
     for(const path of await files(site)){
-      const name=relative(site,path).split('\\').join('/'),body=await readFile(path);
-      if(!(expected.has(name)||(name.startsWith('_astro/')&&extname(name)==='.css')))throw new Error(`出现非预期产物：${name}`);
+      const name=relative(site,path).split('\\').join('/');let body=await readFile(path);
+      const asset=name.startsWith('_astro/')&&['.css','.woff2'].includes(extname(name));
+      if(!(expected.has(name)||asset))throw new Error(`出现非预期产物：${name}`);
+      if(extname(name)==='.woff2'&&body.subarray(0,4).toString()!=='wOF2')throw new Error(`字体文件无效：${name}`);
       if(extname(name)==='.html'){
-        const html=body.toString('utf8');
+        const prefix=relative(dirname(path),site).split('\\').join('/')||'.';
+        // Inline CSS must resolve its local assets within this build, including nested previews.
+        const html=body.toString('utf8').replace(/url\((['"]?)\/(_astro\/[^)'"\s]+)\1\)/g,
+          (_,quote,asset)=>`url(${quote}${prefix}/${asset}${quote})`);
         if(/<script\b|<[^>]*\son\w+\s*=/i.test(html))throw new Error(`阅读站不应包含客户端脚本：${name}`);
+        body=Buffer.from(html);await writeFile(path,body);
         expected.delete(name);
       }
+      if(name==='FONT_LICENSES.txt')expected.delete(name);
       artifacts.push({file:name,bytes:body.length,sha256:createHash('sha256').update(body).digest('hex')});
     }
     if(expected.size)throw new Error(`构建缺少页面：${[...expected].join(', ')}`);
