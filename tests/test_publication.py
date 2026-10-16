@@ -123,6 +123,18 @@ def test_real_boundary_allows_incomplete_preview_but_blocks_approval(sample):
     assert client.get(base + "/curation").json()["latest"] is None
 
 
+def test_personal_note_title_is_preview_default_but_explicit_blog_title_wins(sample):
+    client, base, _ = sample
+    curate(client, base, note_title="Synthetic personal note title")
+    assert client.get(base + "/publication").json()["title"] == "Synthetic personal note title"
+    initial = preview(client, base).json()["latest"]
+    assert initial["public_note"]["title"] == "Synthetic personal note title"
+    assert initial["approval"] is None
+    explicit = preview(client, base, title="Synthetic blog title").json()["latest"]
+    assert explicit["public_note"]["title"] == "Synthetic blog title"
+    assert explicit["approval"] is None
+
+
 def test_allowlist_approval_determinism_and_persisted_trace(sample):
     client, base, _ = sample
     curate(client, base)

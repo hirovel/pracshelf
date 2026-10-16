@@ -74,6 +74,7 @@ def test_read_only_current_stages_preserve_call_records_and_labels(setup):
     for _ in range(2):
         assert client.get(path).json() == first
         summary = client.get("/api/workflows").json()[0]
+        assert summary["created"] == first["created"]
         assert summary["steps"] == [{k: s[k] for k in ("id", "title", "status", "label", "summary")} for s in first["steps"]]
     assert calls == {"source": 1, "model": 1}
     assert rows(root) == before

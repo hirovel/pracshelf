@@ -156,7 +156,7 @@ class Publication:
             "run_id": run_id,
             "origin": self.origin,
             "input": binding,
-            "title": version["document"]["title"],
+            "title": personal.get("note_title") or version["document"]["title"],
             "available_fields": {k: bool(personal.get(k)) for k in ("note", "purpose", "quote")},
             "private_fields": PRIVATE_FIELDS,
             "history": history,
@@ -204,7 +204,7 @@ class Publication:
             # A positive allowlist, never a filtered copy of an internal document/trace.
             note = {
                 "note_id": "note-" + digest(version["document_key"])[:20],
-                "title": payload.title.strip() or doc["title"],
+                "title": payload.title.strip() or p.get("note_title") or doc["title"],
                 "source_url": doc["url"],
                 "source_date": checked.get("confirmed_date"),
                 "source_date_status": "confirmed" if checked.get("confirmed_date") else "unknown",

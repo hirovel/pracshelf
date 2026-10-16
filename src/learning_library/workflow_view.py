@@ -37,7 +37,7 @@ class WorkflowView:
         return [
             {k: value[k] for k in (
                 "run_id", "candidate_id", "title", "author", "published", "url",
-                "version_id", "status", "summary", "steps", "elt",
+                "version_id", "status", "summary", "steps", "elt", "created",
             )}
             for value in (self._view(run, outputs=False, detail="summary") for run in self.flow.list())
         ]
