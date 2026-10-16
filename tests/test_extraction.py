@@ -34,6 +34,29 @@ def test_preserves_preformatted_templates_in_order_with_indentation():
     assert doc["extraction"]["preformatted_blocks"] == {"in_page": 1, "in_text": 1}
 
 
+def test_display_line_numbers_are_removed_without_changing_code_numbers_or_indent():
+    doc = extract_document(
+        page('<pre><code><span class="l"><span class="ln">1</span>const count = 42;</span>\n'
+             '<span class="l"><span class="ln">2</span>    return count + 1;</span>\n'
+             '<span class="l"><span class="ln">3</span></span></code></pre>'),
+        'https://example.com/article', 'text/html',
+    )
+    assert 'const count = 42;\n    return count + 1;\n' in doc['text']
+    assert '1const' not in doc['text'] and '2    return' not in doc['text']
+    assert doc['extraction']['presentation_line_numbers_removed'] == 3
+
+
+@pytest.mark.parametrize('code', [
+    '<span class="ln">42</span> is a code value',
+    ('<code><span class="l"><span class="ln">1</span>first</span>\n'
+     '<span class="l"><span class="ln">9</span>last</span></code>'),
+])
+def test_unrecognized_number_markup_is_preserved(code):
+    doc = extract_document(page(f'<pre>{code}</pre>'), 'https://example.com/article', 'text/html')
+    assert doc['extraction']['presentation_line_numbers_removed'] == 0
+    assert ('42 is a code value' in doc['text']) or ('1first\n9last' in doc['text'])
+
+
 @pytest.mark.parametrize("container", ['div class="body"', "article"])
 def test_article_structure_survives_long_prose_and_highlighted_code(container):
     # Long prose triggers paragraph-only fallback when a legacy body is missed.

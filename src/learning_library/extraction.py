@@ -69,7 +69,16 @@ def extract_document(body: bytes, url: str, content_type: str | None) -> dict:
     # Use deterministic markers so rerunning the same snapshot is idempotent.
     prefix = "SAVEDPRE" + hashlib.sha256(body).hexdigest()[:16]
     blocks = []
+    line_numbers_removed = 0
     for index, node in enumerate(tree.xpath("//pre")):
+        numbers = node.xpath(
+            './/code/span[contains(concat(" ", normalize-space(@class), " "), " l ")]'
+            '/span[contains(concat(" ", normalize-space(@class), " "), " ln ")]'
+        )
+        if numbers and [n.text_content() for n in numbers] == [str(i) for i in range(1, len(numbers) + 1)]:
+            for number in numbers:
+                number.drop_tree()  # Keep the code in the tail; discard only the display number.
+            line_numbers_removed += len(numbers)
         text = "".join(node.itertext())
         if not text.strip():
             continue
@@ -115,12 +124,13 @@ def extract_document(body: bytes, url: str, content_type: str | None) -> dict:
         "text": text,
         "completeness": "html_saved; extracted_text_requires_review",
         "extraction": {
-            "version": "original-v3",
+            "version": "original-v4",
             "format": "html",
             "method": "trafilatura_protected_pre",
             "content_container": content_container,
             "date": date_info,
             "preformatted_blocks": {"in_page": len(blocks), "in_text": preserved},
+            "presentation_line_numbers_removed": line_numbers_removed,
             "warnings": warnings,
         },
     }
