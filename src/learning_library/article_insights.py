@@ -19,7 +19,7 @@ from .storage import now
 from .structured_model import call_json, execution, for_provider
 from .value_preview import EXECUTION as PREVIEW_EXECUTION
 
-PROMPT_VERSION = "article-insights-zh-v3-scope"
+PROMPT_VERSION = "article-insights-zh-v4-problem-method-limits"
 MAX_SOURCE_CHARACTERS = 60_000
 MAX_OUTPUT_TOKENS = 3_000
 INTERRUPTED_REASON = "超过五分钟未完成，结果未知；新提交重试，旧记录保留。"
@@ -82,8 +82,13 @@ technical 技术原理（机制、设计、架构或研究论证）；updates �
 unclassified 未分类（原文不足以判断）。按文章主要目的选一个，有代码不等于实践经验。
 分类不决定 recommendation，产品动态也可能包含有价值的实践。
 reading_reason 简短说明主类依据，已分类时 reading_evidence 提供一条连续原文引文及 supports。
-read/focus 时 core 用连贯自然中文说明文章的问题、作者思路、主要结论及重要限制，
-尽量 200–400 字，不拆成无上下文 tips，不写启示、赋能或泛泛建议。
+read/focus 时 core 用二至三个自然段说明具体问题、做法及重要限制，让读者能判断为何要读原文。
+先写谁在什么任务中遇到了什么问题，再写作者怎样解决、如何实际使用；必要术语首次出现时用原文信息说明其作用。
+保留实现的关键环节与调用方式，不让技术名称、性能数字或个别例子挤掉主要做法；不逐行复述代码。
+区分真实项目、文章公开示例和未来打算；不能把真实项目的能力或效果归给简化示例。
+作者报告的用量、性能和效果明确归于作者，不当作独立验证；保留影响采用的条件和原文明示的限制。
+原文未说明的收益、缺陷或术语定义不补写，具体未证实之处放入 unknowns；订阅、推广等附属内容不作为核心。
+尽量 300–550 字，篇幅服从理解需要，不拆成无上下文 tips，不写启示、赋能或泛泛建议。
 points 最多 5 个有必要核对的关键论断或原文明确的方法；无须凑数，不把文章改成通用流程。
 claim_type 区分作者判断 author_judgment、原文事实陈述 factual_statement（不等于外部查证）、示例 example。
 保留否定、条件、范围与不确定性。core 和每个 point 都必须有支持其内容的原文证据。

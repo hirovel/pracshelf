@@ -1,6 +1,5 @@
 """Private reading views of saved sources; public snapshots are a separate Module."""
 
-import json
 import re
 from html import escape
 from urllib.parse import urljoin, urlparse
@@ -9,6 +8,7 @@ from markdown_it import MarkdownIt
 
 from .article_classification import ArticleClassification
 from .article_insights import ArticleInsights
+from .candidates import Candidates
 from .curation import Curation
 from .processing import ProcessingResults
 
@@ -152,13 +152,7 @@ class Library:
             "request_count": (saved["response"] or {}).get("request_count"),
             "observation": saved["observation"],
         }
-        row = self.flow.store.db.execute(
-            "SELECT id,input FROM candidates WHERE pipeline_id=? ORDER BY created DESC LIMIT 1",
-            (run_id,),
-        ).fetchone()
-        item["discovery"] = None if row is None else {
-            "candidate_id": row["id"], **json.loads(row["input"]),
-        }
+        item["discovery"] = Candidates(self.flow).provenance(run_id)
         item["editable"] = bool(item["has_translation"] and result["id"] == item["latest_result_id"])
         if item["has_translation"]:
             translated = sorted(result["payload"]["segments"], key=lambda p: p["index"])

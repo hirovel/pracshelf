@@ -6,9 +6,9 @@ conflicts and retry idempotency. They never infer a human judgment from AI outpu
 
 import json
 from datetime import UTC, date, datetime
-from typing import Literal
+from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from .review import OriginalReview, ReviewConflict
 from .storage import now
@@ -47,6 +47,15 @@ class CurationInput(BaseModel):
     trial: Literal["not_tried", "useful", "mixed", "not_useful", "not_applicable"] = "not_tried"
     trial_note: str = Field(default="", max_length=2000)
     note: str = Field(default="", max_length=16000)
+    note_title: str = Field(default="", max_length=200)
+    tags: list[Annotated[str, Field(min_length=1, max_length=40)]] = Field(
+        default_factory=list, max_length=12
+    )
+
+    @field_validator("tags")
+    @classmethod
+    def unique_tags(cls, values):
+        return list(dict.fromkeys(values))
 
     @model_validator(mode="after")
     def consistent(self):
@@ -129,7 +138,8 @@ class Curation:
                 (payload.version_id, payload.submission_id),
             ).fetchone()
             if existing:
-                if existing["payload"] != encoded or existing["origin"] != self.origin:
+                previous = CurationInput.model_validate_json(existing["payload"])
+                if previous != payload or existing["origin"] != self.origin:
                     raise ReviewConflict("同一提交标识不能保存不同的整理内容。")
                 return state
             if payload.previous_id != (state["latest"]["id"] if state["latest"] else None):
@@ -161,8 +171,20 @@ def export_note(document, state):
     p = record["payload"]
     if not p["note"].strip():
         raise ValueError("请先保存笔记正文，再导出 Markdown。")
-    lines = [
-        f"# {document['title']}",
+    properties = {
+        "title": p.get("note_title") or document["title"],
+        "source_url": document["url"],
+        "source_author": document.get("author"),
+        "source_published": document.get("published"),
+        "source_version": state["version_id"],
+        "tags": p.get("tags", []),
+    }
+    # JSON values are valid YAML scalars/lists; user input cannot create properties.
+    lines = ["---", *[
+        f"{key}: {json.dumps(value, ensure_ascii=False)}"
+        for key, value in properties.items() if value is not None
+    ], "---", "",
+        f"# {properties['title']}",
         "",
         f"来源：{document['url']}",
         f"原文版本：{state['version_id']}",

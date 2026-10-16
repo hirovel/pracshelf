@@ -99,6 +99,29 @@ def test_invalid_quotes_stop_before_translation_instead_of_reporting_execution_f
     assert calls == {"source": 1, "model": 1}
 
 
+def test_reextracted_reader_and_workflow_keep_explicit_discovery_without_old_judgment(setup):
+    client, candidate, _, calls, _, root = setup
+    screen(client, candidate)
+    current = candidate["pipeline_id"]
+    for _ in range(2):
+        current = client.post(f"/api/runs/{current}/reextract").json()["id"]
+        extracted = client.post(f"/api/runs/{current}/stages/extract").json()
+        assert extracted["stages"][1]["status"] == "succeeded"
+    article = client.get(f"/api/library/{current}").json()
+    workflow = client.get(f"/api/workflows/{current}?detail=summary").json()
+    before = rows(root)  # First access may initialize empty module tables.
+    assert client.get(f"/api/library/{current}").json() == article
+    assert client.get(f"/api/workflows/{current}?detail=summary").json() == workflow
+    assert article["discovery"]["candidate_id"] == candidate["id"]
+    assert article["discovery"]["pipeline_id"] == candidate["pipeline_id"]
+    assert article["discovery"]["source_note"] == "Explicitly synthetic source"
+    assert workflow["provenance"] == article["discovery"]
+    assert workflow["candidate_id"] is None  # Discovery does not move an old screening.
+    assert workflow["steps"][1]["status"] == "not_started"
+    assert rows(root) == before
+    assert calls == {"source": 1, "model": 1}
+
+
 def test_translation_output_and_old_source_results_are_not_mixed(setup):
     client, candidate, path, calls, _, root = setup
     screen(client, candidate)

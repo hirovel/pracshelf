@@ -22,7 +22,7 @@ export function libraryView(rows,{filter='all',query='',category=''}={}){
     if(filter==='notes'&&!row.note?.trim())return false;
     if(category&&row.category!==category)return false;
     const payload=row.curation?.latest?.payload||{};
-    const text=[row.title,row.author,row.domain,row.url,row.note,categories[row.category],row.classification?.reason,payload.purpose,payload.applicability,payload.trial_note].join(' ').toLocaleLowerCase();
+    const text=[row.title,row.author,row.domain,row.url,row.note,payload.note_title,...(payload.tags||[]),categories[row.category],row.classification?.reason,payload.purpose,payload.applicability,payload.trial_note].join(' ').toLocaleLowerCase();
     return !search||text.includes(search);
   }).sort((left,right)=>(right.publicationDate||'').localeCompare(left.publicationDate||'')||String(right.saved||'').localeCompare(String(left.saved||'')));
 }

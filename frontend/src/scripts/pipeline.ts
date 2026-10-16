@@ -1,6 +1,7 @@
 /* ELT state and lineage come from WorkflowView. This page only displays them and
    submits an explicit action through the existing capture/insights Interface. */
 import {currentRun} from './application-navigation.js';
+import {workflowChoices} from './workflow-choices.js';
 declare const readingUI:{reduceMotion:()=>boolean};
 type Operation = {id:string;phase:string;title:string;status:string;label:string;summary:string;executor:string;required:boolean;input:any;output:any;detail:any;action:{kind:string;stage?:string;candidate_id?:string;label:string}|null};
 type FlowNode = {id:string;title:string;status:string;label:string;summary:string;operation_id:string;operation_ids:string[];optional:boolean};
@@ -273,10 +274,11 @@ async function select(run:string) {
 }
 async function loadList(run?:string) {
   const rows=await request('/api/workflows');const selectBox=get('flow-material') as HTMLSelectElement;
-  selectBox.replaceChildren(...rows.map((row:any)=>new Option(row.title,row.run_id)));
   if(!rows.length){get('flow-document').hidden=true;get('flow-empty').hidden=false;get('flow-loading').hidden=true;return;}
   const remembered=rows.some((row:any)=>row.run_id===currentRun())?currentRun():null;
-  const chosen=run||current?.run_id||params.get('run')||remembered||rows[0].run_id;await select(chosen);
+  const chosen=run||current?.run_id||params.get('run')||remembered||rows[0].run_id;
+  selectBox.replaceChildren(...workflowChoices(rows,chosen).map((row:any)=>new Option(row.title+(row.historical?' · 历史运行':''),row.run_id)));
+  await select(chosen);
 }
 get('flow-material').onchange=()=>{selected='';select((get('flow-material') as HTMLSelectElement).value);};
 get('flow-refresh').onclick=()=>{if(!busy)loadList();};

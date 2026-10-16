@@ -213,7 +213,7 @@ def test_fidelity_prompt_upgrade_preserves_the_saved_version_without_another_cal
     monkeypatch.setattr(article_insights, "PROMPT_VERSION", current_revision)
 
     state = client.get(base + "/insights").json()
-    assert state["input"]["prompt_version"] == "article-insights-zh-v3-scope"
+    assert state["input"]["prompt_version"] == "article-insights-zh-v4-problem-method-limits"
     assert "每条核心论断都先明确适用对象" in state["input"]["request"]["messages"][0]["content"]
     assert state["latest"] == saved | {"current": False}
     assert state["input"]["cache_key"] != saved["input"]["cache_key"]

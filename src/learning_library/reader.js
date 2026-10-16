@@ -83,12 +83,15 @@
   el('reading-notes').setAttribute('aria-controls','notes-dialog');
   el('reading-notes').setAttribute('aria-expanded','false');
   function showNotes(){
+    const readingPosition=scrollY;
     notesClosing?.cancel();notesClosing=null;
     notesDialog.getAnimations().forEach(animation=>animation.cancel());
     if(notesDialog.open)notesDialog.close();
     if(notesDock.matches)notesDialog.show();else notesDialog.showModal();
     document.body.classList.add('notes-open');
     el('reading-notes').setAttribute('aria-expanded','true');
+    window.scrollTo({top:readingPosition,behavior:'instant'});
+    requestAnimationFrame(()=>window.scrollTo({top:readingPosition,behavior:'instant'}));
     if(!reduced())notesDialog.animate([{opacity:0,transform:'translateX(14px)'},{opacity:1,transform:'none'}],{duration:200,easing:'cubic-bezier(.2,.7,.2,1)'});
   }
   function closeNotes(){
@@ -100,7 +103,9 @@
   }
   notesDialog.addEventListener('close',()=>{
     if(notesDialog.open)return;
+    const readingPosition=scrollY;
     document.body.classList.remove('notes-open');el('reading-notes').setAttribute('aria-expanded','false');
+    window.scrollTo({top:readingPosition,behavior:'instant'});
   });
   notesDialog.addEventListener('cancel',event=>{event.preventDefault();closeNotes();});
   notesDock.addEventListener('change',()=>{if(notesDialog.open)showNotes();});

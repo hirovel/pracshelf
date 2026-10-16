@@ -8,13 +8,16 @@ PracShelf 是本地文章阅读与笔记工具。支持 AI 实践资料筛选、
 - 采集模块保存原始响应和正文版本。旧版本保留。
 - 模型在一次任务中判断阅读价值并提取核心内容。提取结果附原文引文。
 - 翻译按需执行。阅读页支持原文、中文和左右对照。
-- 阅读页和笔记博客提供章节目录。
+- 阅读页左侧显示资料与章节目录。AI 导读和调用记录默认折叠。
 - 流程页显示阶段状态、输入、结果和错误。失败阶段可单独重试，成功产物保留。
 - 调用记录显示输入、缓存读取、输出 tokens 和耗时。完整日志按需加载。
-- 阅读旁可展开笔记区。支持 Markdown 预览、草稿恢复、历史版本、导出和静态博客构建。
+- 阅读旁可展开笔记区。支持标题、标签、代码、Markdown 预览、草稿恢复和历史版本。
+- 笔记可导出 Markdown。文件头保留来源、原文版本和标签。已确认笔记可构建静态博客。
 - 备份包含数据库和文件产物。恢复时校验路径、哈希和数据库完整性。
 
 RSS 刷新、原文采集和旧结果读取不调用模型。
+
+笔记只在点击保存时写入本地数据库。未保存草稿暂存在当前浏览器标签会话。Markdown 导出读取已保存版本，不包含完整原文或译文。文件导出不包含双向同步功能。
 
 ## 流程
 
@@ -136,7 +139,7 @@ uv sync --locked --extra deepseek --no-dev
 uv sync --locked
 uv run pytest -q
 uv run ruff check src tests examples/curation_demo.py
-node --test frontend/scripts/publish.test.mjs frontend/src/scripts/navigation-context.test.mjs frontend/src/scripts/library-view.test.mjs frontend/src/scripts/presentation.test.mjs frontend/reading/markdown.test.mjs frontend/reading/snapshots.test.mjs
+node --test frontend/scripts/publish.test.mjs frontend/src/scripts/navigation-context.test.mjs frontend/src/scripts/library-view.test.mjs frontend/src/scripts/workflow-choices.test.mjs frontend/src/scripts/presentation.test.mjs frontend/reading/markdown.test.mjs frontend/reading/snapshots.test.mjs
 ```
 
 测试使用隔离目录和模拟模型。覆盖版本绑定、重复提交、失败重试、引文定位、笔记导出、快照隔离、构建和备份恢复。

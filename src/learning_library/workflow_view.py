@@ -63,7 +63,7 @@ class WorkflowView:
         if active is None:
             active = next((s for s in steps if s["status"] != "completed"), reviewed)
         default_step = "screen" if screen["output"] else active["id"]
-        origin = candidate["input"] if candidate else None
+        origin = self.candidates.provenance(run["id"])
         # List responses omit large artifacts. Both paths use the same status rules.
         brief = [{k: s[k] for k in ("id", "title", "status", "label", "summary")} for s in steps]
         elt = self._elt(run, version, screen, translated, insights, candidate["id"] if candidate else None)

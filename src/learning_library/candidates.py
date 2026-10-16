@@ -112,6 +112,25 @@ class Candidates:
             )
         return self.inspect(candidate_id)
 
+    def provenance(self, pipeline_id):
+        """Follow explicit offline capture reuse; never reuse a judgment across versions."""
+        visited = set()
+        while pipeline_id and pipeline_id not in visited:
+            visited.add(pipeline_id)
+            candidate = self.store.db.execute(
+                "SELECT id,input,pipeline_id FROM candidates WHERE pipeline_id=? ORDER BY created DESC LIMIT 1",
+                (pipeline_id,),
+            ).fetchone()
+            if candidate:
+                return {"candidate_id": candidate["id"], **json.loads(candidate["input"]),
+                        "pipeline_id": candidate["pipeline_id"]}
+            fetch = self.store.db.execute(
+                "SELECT input FROM pipeline_attempts WHERE pipeline_id=? AND stage='fetch' "
+                "AND status='succeeded' ORDER BY id DESC LIMIT 1", (pipeline_id,),
+            ).fetchone()
+            pipeline_id = json.loads(fetch["input"]).get("reused_from_pipeline_id") if fetch else None
+        return None
+
     def list(self, *, q="", state="all", freshness="all", origin="all"):
         if state not in {"all", "saved", "failed", "unscreened"}:
             raise ValueError("未知的采集筛选条件。")

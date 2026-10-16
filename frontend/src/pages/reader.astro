@@ -1,7 +1,15 @@
 ---
 import ReadingLayout from '@/layouts/ReadingLayout.astro';
+import '@/styles/reader-workspace.css';
 ---
-<ReadingLayout>
+<ReadingLayout workspace>
+  <aside id="reader-sources" class="reader-sources" aria-label="资料与本文目录">
+    <div class="sources-heading"><h2>资料</h2><span id="source-count"></span></div>
+    <label class="source-search">查找资料<input id="source-search" type="search" placeholder="标题、作者、标签" autocomplete="off"/></label>
+    <nav id="source-list" aria-label="已保存资料"><p role="status">正在读取…</p></nav>
+    <details class="source-outline" open><summary>本文目录</summary><nav id="source-outline" aria-label="本文小节"></nav></details>
+    <p class="sources-footer">本地资料库</p>
+  </aside>
   <p id="loading" class="loading" role="status">正在读取已保存的文章…</p><p id="error" class="read-error" role="alert" hidden></p>
   <div id="article" hidden>
     <header class="article-heading"><div class="hero-inner"><a href="/" class="hero-crumb">资料 / 原文阅读 ↗</a><h1 id="title"></h1><p class="hero-date">原文发布 <time id="published"></time></p></div></header>
@@ -21,4 +29,5 @@ import ReadingLayout from '@/layouts/ReadingLayout.astro';
   <dialog id="notes-dialog" aria-labelledby="notes-heading"><div class="dialog-heading"><h2 id="notes-heading">我的笔记</h2><button data-close aria-label="关闭笔记">×</button></div><section id="curation-panel"></section></dialog>
   <script slot="scripts" is:inline src="/assets/record-view.js"></script><script slot="scripts" is:inline src="/curation.js"></script><script slot="scripts" is:inline src="/assets/reader.js"></script>
   <script>import '@/scripts/reading-polish.js';</script>
+  <script>import '@/scripts/reader-workspace.js';</script>
 </ReadingLayout>

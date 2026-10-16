@@ -14,7 +14,7 @@ function measure(){
 function update(){
   frame=null;let index=-1;
   for(let i=0;i<positions.length;i++){if(positions[i]<=scrollY+115)index=i;else break;}
-  document.querySelectorAll('#outline-links a').forEach(link=>{
+  document.querySelectorAll('#outline-links a,#source-outline a').forEach(link=>{
     if(index>=0&&link.hash==='#'+headings[index].id)link.setAttribute('aria-current','location');else link.removeAttribute('aria-current');
   });
 }

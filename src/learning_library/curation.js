@@ -9,10 +9,13 @@ const curationEditor = (() => {
     <p id="curation-version" class="curation-hint"></p>
     <form id="curation-form"><fieldset id="curation-fields" disabled>
       <div class="curation-editor-tabs" role="group" aria-label="笔记视图"><button type="button" id="curation-edit" aria-pressed="true">编辑</button><button type="button" id="curation-preview-button" aria-pressed="false" disabled>预览</button></div>
+      <label class="curation-title-label">标题（可选）<input name="note_title" maxlength="200" placeholder="未填写时使用原文标题"></label>
+      <div class="curation-format" role="group" aria-label="Markdown 格式"><button type="button" data-insert="heading">标题</button><button type="button" data-insert="code">代码</button><button type="button" data-insert="list">清单</button></div>
       <label class="curation-note-label">笔记正文<span id="curation-count" class="curation-hint">Markdown · 0 / 16,000</span><textarea name="note" maxlength="16000" rows="10" placeholder="记录你的理解、实际尝试或待解决的问题。支持 Markdown。"></textarea></label>
       <section id="curation-preview" class="curation-preview prose" aria-label="Markdown 预览" hidden></section>
       <div class="curation-actions"><button type="submit" class="curation-save">保存笔记</button><a id="curation-export" aria-disabled="true" title="保存笔记正文后可导出">导出 Markdown ↓</a><button type="button" id="curation-reset">恢复已保存内容</button></div>
       <p class="curation-hint curation-shortcut">Ctrl / ⌘ S 保存 · 导出读取已保存正文</p>
+      <details class="curation-properties"><summary>标签（可选）</summary><label>标签<input name="tags" maxlength="500" placeholder="用逗号分隔，最多 12 个"></label><p class="curation-hint">来源和原文版本随笔记导出。标签由你填写。</p></details>
       <details class="curation-metadata"><summary>分类、用途与其他记录（可选）</summary><div class="curation-grid">
         <label>类别<select name="category"><option value="unclassified">未分类</option><option value="skill">Skills</option><option value="prompt">提示词</option><option value="workflow">工作流</option><option value="knowledge">知识</option></select></label>
         <label>整理决定<select name="decision"><option value="inbox">留在收集箱</option><option value="kept">保留到资料库</option><option value="archived">归档（仍可恢复）</option></select></label>
@@ -42,7 +45,7 @@ const curationEditor = (() => {
     <details class="curation-debug"><summary>调试数据</summary><a id="curation-json" download>下载笔记记录 JSON</a></details>`;
   const el = id => document.getElementById(id);
   const form = el('curation-form');
-  const defaults = {category:'unclassified',decision:'inbox',purpose:'',note:'',freshness:'unknown',checked_on:null,applicability:'',trial:'not_tried',trial_note:'',quote:''};
+  const defaults = {category:'unclassified',decision:'inbox',purpose:'',note:'',note_title:'',tags:[],freshness:'unknown',checked_on:null,applicability:'',trial:'not_tried',trial_note:'',quote:''};
   const labels = {inbox:'待整理',kept:'已保留',archived:'已归档'};
   const trialLabels = {not_tried:'未试用',useful:'试用有帮助',mixed:'部分有帮助',not_useful:'试用无帮助',not_applicable:'无需试用'};
   let runId = null, state = null, baseId = null, submissionId = null, token = 0, saving = false;
@@ -51,17 +54,21 @@ const curationEditor = (() => {
   function values() {
     const value = Object.fromEntries(Object.keys(defaults).map(name => [name, form.elements[name].value]));
     value.checked_on = value.checked_on || null;
+    value.tags = [...new Set(value.tags.split(/[,，]/).map(tag => tag.trim()).filter(Boolean))];
     return value;
   }
   function populate(value) {
-    for (const name of Object.keys(defaults)) form.elements[name].value = value[name] ?? defaults[name] ?? '';
+    for (const name of Object.keys(defaults)) {
+      const item = value[name] ?? defaults[name] ?? '';
+      form.elements[name].value = name === 'tags' ? item.join(', ') : item;
+    }
     el('curation-count').textContent = 'Markdown · ' + form.elements.note.value.length.toLocaleString() + ' / 16,000';
     updateDraftState();
     renderPreview();
   }
   function updateDraftState() {
-    const saved = state?.latest?.payload || defaults;
-    const dirty = state?.available && Object.entries(values()).some(([name,value]) => value !== saved[name]);
+    const saved = {...defaults, ...state?.latest?.payload};
+    const dirty = state?.available && Object.entries(values()).some(([name,value]) => JSON.stringify(value) !== JSON.stringify(saved[name]));
     el('curation-draft').textContent = dirty ? '未保存' : state?.latest ? '已保存' : '未编辑';
     el('curation-draft').dataset.dirty = String(Boolean(dirty));
     return Boolean(dirty);
@@ -84,6 +91,18 @@ const curationEditor = (() => {
   }
   el('curation-edit').onclick = () => selectView(false);
   el('curation-preview-button').onclick = () => selectView(true);
+  root.querySelectorAll('[data-insert]').forEach(button => button.onclick = () => {
+    selectView(false);
+    const area = form.elements.note, selected = area.value.slice(area.selectionStart, area.selectionEnd);
+    const kind = button.dataset.insert;
+    const text = kind === 'code' ? '```\n' + selected + '\n```' : (kind === 'heading' ? '## ' : '- ') + selected;
+    const prefix = area.selectionStart && area.value[area.selectionStart - 1] !== '\n' ? '\n\n' : '';
+    if (area.value.length - selected.length + prefix.length + text.length > 16000) {
+      el('curation-error').textContent = '笔记超过 16,000 字符，请删减后再插入。'; return;
+    }
+    area.setRangeText(prefix + text, area.selectionStart, area.selectionEnd, 'end');
+    area.dispatchEvent(new Event('input', {bubbles:true}));
+  });
   function persist() {
     if (!state?.available) return;
     try { sessionStorage.setItem(key(), JSON.stringify({values:values(),baseId,submissionId})); }

@@ -36,3 +36,11 @@ test('notes view uses personal notes and leaves technical review remarks out',()
   const personal=row('personal','kept');personal.note='Synthetic personal note';
   assert.deepEqual(libraryView([technical,personal],{filter:'notes'}).map(item=>item.run_id),['personal']);
 });
+
+test('personal note titles and tags are searchable without changing source titles',()=>{
+  const entry=row('note');entry.curation.latest.payload.note_title='Local FTS experiment';
+  entry.curation.latest.payload.tags=['SQLite','context'];
+  assert.equal(libraryView([entry],{query:'fts experiment'}).length,1);
+  assert.equal(libraryView([entry],{query:'sqlite'}).length,1);
+  assert.equal(entry.title,'AI practice note');
+});

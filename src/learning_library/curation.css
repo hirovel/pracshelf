@@ -55,3 +55,9 @@
 .reading-blog #notes-dialog .curation-preview h3{padding-top:16px;font-size:16px}
 .curation-preview.prose a{overflow-wrap:anywhere}
 .curation-preview .code-copy{font-family:var(--font-display)}
+.curation .curation-title-label{font-size:12px;color:var(--muted);margin:12px 0 18px}
+.curation-title-label input{font-size:15px;color:var(--ink)}
+.curation-format{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px}
+.curation .curation-format button{font-size:11px;padding:4px 9px;background:none;color:var(--muted)}
+.curation .curation-format button:hover{background:var(--wash);color:var(--ink)}
+.curation .curation-properties{padding-top:12px}

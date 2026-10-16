@@ -155,6 +155,61 @@ def test_empty_note_body_cannot_be_exported_as_personal_writing(setup):
         assert exported.status_code == 400 and "笔记正文" in exported.json()["detail"]
 
 
+def test_note_properties_survive_save_and_export(setup):
+    import json
+
+    app, _ = setup
+    with TestClient(app) as client:
+        base = capture(client)
+        state = client.get(base + "/curation").json()
+        incoming = payload(state, note_title='Fixture: "local"', tags=["SQLite", "工作流", "SQLite"])
+        saved = client.post(base + "/curation", json=incoming)
+        assert saved.status_code == 200
+        record = saved.json()["latest"]
+        assert record["payload"]["tags"] == ["SQLite", "工作流"]
+        assert client.post(base + "/curation", json=incoming).json()["latest"]["id"] == record["id"]
+        exported = client.get("/api/library/" + base.rsplit("/", 1)[-1] + "/note").text
+        frontmatter = exported.split("---", 2)[1]
+        properties = {key: json.loads(value) for key, value in (
+            line.split(": ", 1) for line in frontmatter.strip().splitlines()
+        )}
+        assert properties["title"] == 'Fixture: "local"'
+        assert properties["tags"] == ["SQLite", "工作流"]
+        assert properties["source_version"] == state["version_id"]
+        assert properties["source_url"] == "https://example.com/workflow.md"
+        assert SOURCE not in exported
+
+        updated = payload(saved.json(), tags=["x" * 41])
+        assert client.post(base + "/curation", json=updated).status_code == 422
+        assert client.post(base + "/curation", json=payload(saved.json(), tags=[" "])).status_code == 422
+        assert client.post(base + "/curation", json=payload(saved.json(), tags=list(map(str, range(13))))).status_code == 422
+
+
+def test_legacy_payload_defaults_do_not_break_retry_or_rewrite_history(tmp_path):
+    import json
+    import sqlite3
+
+    app = create_app(tmp_path, httpx.MockTransport(lambda request: httpx.Response(
+        200, text=SOURCE, headers={"Content-Type": "text/markdown"},
+    )))
+    with TestClient(app) as client:
+        base = capture(client)
+        incoming = payload(client.get(base + "/curation").json())
+        record = client.post(base + "/curation", json=incoming).json()["latest"]
+        historical = dict(record["payload"])
+        historical.pop("note_title")
+        historical.pop("tags")
+        encoded = json.dumps(historical, ensure_ascii=False, sort_keys=True)
+        with sqlite3.connect(tmp_path / "library.sqlite3") as db:
+            db.execute("UPDATE curation_records SET payload=? WHERE id=?", (encoded, record["id"]))
+        retried = client.post(base + "/curation", json=incoming)
+        assert retried.status_code == 200
+        assert retried.json()["latest"]["payload"] == historical
+        assert len(retried.json()["history"]) == 1
+        with sqlite3.connect(tmp_path / "library.sqlite3") as db:
+            assert db.execute("SELECT payload FROM curation_records").fetchone()[0] == encoded
+
+
 def test_same_version_shares_notes_but_new_version_requires_new_judgment(setup):
     app, body = setup
     with TestClient(app) as client:
